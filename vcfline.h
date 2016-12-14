@@ -31,14 +31,18 @@ public:
     void setFilter(const QByteArray &filter);
 
     const QByteArray& rawFormat() const;
+    QByteArrayList formats() const;
     void setRawFormat(const QByteArray &rawFormat);
 
     const QByteArray& rawInfos() const;
     QHash<QByteArray, QVariant> infos() const;
     void setRawInfos(const QByteArray &rawInfos);
 
-    const QByteArray &rawSample(int i) const;
+    QByteArray rawSample(int i) const;
+    QHash<QByteArray, QVariant> sample(int i);
     void addRawSample(const QByteArray& rawSample);
+    int sampleCount() const;
+
 
 private:
     QByteArray mChromosom;

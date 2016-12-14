@@ -57,5 +57,5 @@ void MainWindow::setInfo(const QModelIndex &index)
 
 void MainWindow::setFilename(const QString &filename)
 {
-    mModel->setFilename("/home/sacha/test.vcf.gz");
+    mModel->setFilename("/home/sacha/missing.vcf.gz");
 }

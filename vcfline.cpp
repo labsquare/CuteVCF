@@ -101,6 +101,11 @@ const QByteArray& VcfLine::rawFormat() const
     return mFormat;
 }
 
+QByteArrayList VcfLine::formats() const
+{
+    return rawFormat().split(':');
+}
+
 void VcfLine::setRawFormat(const QByteArray &format)
 {
     mFormat = format;
@@ -129,14 +134,38 @@ void VcfLine::setRawInfos(const QByteArray &infos)
     mInfos = infos;
 }
 
-const QByteArray &VcfLine::rawSample(int i) const
+ QByteArray VcfLine::rawSample(int i) const
 {
     return mSamples.value(i,QByteArray());
+}
+
+QHash<QByteArray, QVariant> VcfLine::sample(int i)
+{
+    QHash<QByteArray, QVariant> out;
+    QByteArrayList format = formats();
+
+    qDebug()<<rawSample(i);
+
+    QByteArrayList values = rawSample(i).split(':');
+    for (int i=0; i<values.size();++i)
+    {
+        if (i<format.count())
+        {
+            out.insert(format.at(i), values.at(i));
+        }
+
+    }
+    return out;
 }
 
 void VcfLine::addRawSample(const QByteArray &sample)
 {
     mSamples.append(sample);
+}
+
+int VcfLine::sampleCount() const
+{
+    return mSamples.count();
 }
 
 
