@@ -9,6 +9,9 @@
 #include <vector>
 
 
+#include <QtCore>
+#include <QDebug>
+
 using namespace std;
 
 class Tabix {

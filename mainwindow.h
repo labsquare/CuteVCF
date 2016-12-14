@@ -12,9 +12,13 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+public slots:
+    void setRegion(const QString& region);
+
 private:
     QTableView * mView;
     VcfModel * mModel;
+    QLineEdit * mSearchEdit;
 
 
 };
