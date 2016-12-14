@@ -3,10 +3,11 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
 {
-    mView       = new QTableView;
-    mModel      = new VcfModel;
-    mSearchEdit = new QLineEdit;
-    mInfoWidget = new InfoWidget;
+    mView         = new QTableView;
+    mModel        = new VcfModel;
+    mSearchEdit   = new QLineEdit;
+    mInfoWidget   = new InfoWidget;
+    mSampleWidget = new SampleWidget;
 
     mView->setModel(mModel);
     setCentralWidget(mView);
@@ -24,13 +25,18 @@ MainWindow::MainWindow(QWidget *parent) :
     mainToolBar->addWidget(mSearchEdit);
     setFilename("/home/sacha/test.vcf.gz");
 
-    QDockWidget * infoWidget = new QDockWidget();
-    infoWidget->setWidget(mInfoWidget);
+    QDockWidget * infoDock = new QDockWidget("Infos");
+    infoDock->setWidget(mInfoWidget);
 
-    addDockWidget(Qt::RightDockWidgetArea, infoWidget);
+    QDockWidget * sampleDock = new QDockWidget("Sample");
+    sampleDock->setWidget(mSampleWidget);
+
+    addDockWidget(Qt::RightDockWidgetArea, infoDock);
+    addDockWidget(Qt::RightDockWidgetArea, sampleDock);
+
 
     connect(mSearchEdit,SIGNAL(textChanged(QString)),this,SLOT(setRegion(QString)));
-    connect(mView, SIGNAL(entered(QModelIndex)),this,SLOT(setInfo(QModelIndex)));
+    connect(mView, SIGNAL(activated(QModelIndex)),this,SLOT(setInfo(QModelIndex)));
 
 }
 
@@ -45,8 +51,8 @@ void MainWindow::setRegion(const QString &region)
 
 void MainWindow::setInfo(const QModelIndex &index)
 {
-
     mInfoWidget->setLine(mModel->line(index));
+    mSampleWidget->setLine(mModel->line(index));
 }
 
 void MainWindow::setFilename(const QString &filename)

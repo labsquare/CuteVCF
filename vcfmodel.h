@@ -16,6 +16,8 @@ public:
     void setFilename(const QString &filename);
     const VcfLine& line(const QModelIndex& index);
 
+
+
 protected:
      int rowCount(const QModelIndex &parent) const Q_DECL_OVERRIDE;
      int columnCount(const QModelIndex &parent) const Q_DECL_OVERRIDE;
@@ -26,6 +28,8 @@ protected:
 private:
      QList<VcfLine> mLines;
      QString mFilename;
+      Tabix mTabixFile;
+
 
 
 };

@@ -31,12 +31,14 @@ SOURCES += main.cpp\
     tabix.cpp \
     vcfmodel.cpp \
     vcfline.cpp \
-    infowidget.cpp
+    infowidget.cpp \
+    samplewidget.cpp
 
 HEADERS  += mainwindow.h \
     tabix.hpp \
     vcfmodel.h \
     vcfline.h \
-    infowidget.h
+    infowidget.h \
+    samplewidget.h
 
 

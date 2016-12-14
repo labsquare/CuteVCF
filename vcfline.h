@@ -7,46 +7,50 @@ class VcfLine
 public:
     VcfLine();
 
-    QString chromosom() const;
-    void setChromosom(const QString &chromosom);
+    static VcfLine fromLine(const QByteArray& line);
+
+    const QByteArray& chromosom() const;
+    void setChromosom(const QByteArray &chromosom);
 
     quint64 position() const;
     void setPosition(const quint64 &position);
 
-    QString id() const;
-    void setId(const QString &id);
+    const QByteArray& id() const;
+    void setId(const QByteArray &id);
 
-    QString ref() const;
-    void setRef(const QString &ref);
+    const QByteArray& ref() const;
+    void setRef(const QByteArray &ref);
 
-    QString alt() const;
-    void setAlt(const QString &alt);
+    const QByteArray& alt() const;
+    void setAlt(const QByteArray &alt);
 
     int qual() const;
     void setQual(int qual);
 
-    QString filter() const;
-    void setFilter(const QString &filter);
+    const QByteArray& filter() const;
+    void setFilter(const QByteArray &filter);
 
-    void addInfo(const QString& key, const QVariant& value);
-    void clearInfo();
+    const QByteArray& rawFormat() const;
+    void setRawFormat(const QByteArray &rawFormat);
 
-    const QHash<QString,QVariant>& infos() const;
+    const QByteArray& rawInfos() const;
+    QHash<QByteArray, QVariant> infos() const;
+    void setRawInfos(const QByteArray &rawInfos);
 
-    void addSampleInfo(const QString& sample, const QString& key, const QVariant& value);
-    void clearSample();
-
+    const QByteArray &rawSample(int i) const;
+    void addRawSample(const QByteArray& rawSample);
 
 private:
-    QString mChromosom;
-    quint64 mPosition;
-    QString mId;
-    QString mRef;
-    QString mAlt;
-    int mQual;
-    QString mFilter;
-    QHash<QString,QVariant> mInfos;
-    QHash<QString, QHash<QString, QVariant> > mSamples;
+    QByteArray mChromosom;
+    quint64 mPosition = 0;
+    QByteArray mId;
+    QByteArray mRef;
+    QByteArray mAlt;
+    int mQual = 0;
+    QByteArray mFilter;
+    QByteArray mFormat;
+    QByteArray mInfos;
+    QByteArrayList mSamples;
 
 };
 

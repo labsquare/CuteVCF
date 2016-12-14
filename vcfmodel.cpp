@@ -72,40 +72,12 @@ void VcfModel::setRegion(const QString &region)
     beginResetModel();
     mLines.clear();
 
-
-    string s_filename = mFilename.toStdString();
-    Tabix file(s_filename);
-
-
-
     string s_region(region.toStdString());
-    file.setRegion(s_region);
+    mTabixFile.setRegion(s_region);
     string line;
-    while (file.getNextLine(line))
+    while (mTabixFile.getNextLine(line))
     {
-        QStringList items = QString::fromStdString(line).split("\t");
-        VcfLine item;
-
-        item.setChromosom(items.at(0));
-        item.setPosition(items.at(1).toUInt());
-        item.setId(items.at(2));
-        item.setRef(items.at(3));
-        item.setAlt(items.at(4));
-        item.setQual(items.at(5).toInt());
-        item.setFilter(items.at(6));
-
-        QString info = items.at(7);
-        for (QString i : info.split(";"))
-        {
-            QStringList ipair = i.split("=");
-            if (ipair.size() == 2 )
-            {
-               QString key = ipair[0];
-               QString val = ipair[1];
-               item.addInfo(key,val);
-            }
-
-        }
+        VcfLine item = VcfLine::fromLine(QByteArray::fromStdString(line));
         mLines.append(item);
     }
 
@@ -115,12 +87,17 @@ void VcfModel::setRegion(const QString &region)
 
 QString VcfModel::filename() const
 {
+
     return mFilename;
 }
 
 void VcfModel::setFilename(const QString &filename)
 {
     mFilename = filename;
+
+    string s_filename = mFilename.toStdString();
+    mTabixFile.setFilename(s_filename);
+
 }
 
 const VcfLine &VcfModel::line(const QModelIndex &index)

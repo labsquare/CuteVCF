@@ -22,12 +22,13 @@ InfoWidget::InfoWidget(QWidget *parent) : QWidget(parent)
 void InfoWidget::setLine(const VcfLine &line)
 {
     mModel->clear();
-    qDebug()<<"salt";
 
-    for (QString key : line.infos().keys()){
+    QHash<QByteArray, QVariant> infos = line.infos();
 
-        QStandardItem * keyItem = new QStandardItem(key);
-        QStandardItem * valItem = new QStandardItem(line.infos().value(key).toString());
+    for (QByteArray key : infos.keys()){
+
+        QStandardItem * keyItem = new QStandardItem(QString::fromUtf8(key));
+        QStandardItem * valItem = new QStandardItem(infos.value(key).toString());
 
         QList<QStandardItem*> row ;
         row.append(keyItem);

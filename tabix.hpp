@@ -38,5 +38,6 @@ public:
     void getHeader(string& header);
     bool setRegion(string& region);
     bool getNextLine(string& line);
+    void setFilename(string& file);
 
 };

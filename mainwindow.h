@@ -5,6 +5,7 @@
 #include <QtWidgets>
 #include "vcfmodel.h"
 #include "infowidget.h"
+#include "samplewidget.h"
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -23,6 +24,7 @@ private:
     VcfModel * mModel;
     QLineEdit * mSearchEdit;
     InfoWidget * mInfoWidget;
+    SampleWidget * mSampleWidget;
 
 };
 
