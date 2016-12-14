@@ -14,6 +14,7 @@ public:
     void setRegion(const QString& region);
     QString filename() const;
     void setFilename(const QString &filename);
+    const VcfLine& line(const QModelIndex& index);
 
 protected:
      int rowCount(const QModelIndex &parent) const Q_DECL_OVERRIDE;

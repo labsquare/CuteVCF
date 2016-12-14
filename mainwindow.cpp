@@ -6,6 +6,7 @@ MainWindow::MainWindow(QWidget *parent) :
     mView       = new QTableView;
     mModel      = new VcfModel;
     mSearchEdit = new QLineEdit;
+    mInfoWidget = new InfoWidget;
 
     mView->setModel(mModel);
     setCentralWidget(mView);
@@ -21,11 +22,15 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     mainToolBar->addWidget(mSearchEdit);
+    setFilename("/home/sacha/test.vcf.gz");
 
+    QDockWidget * infoWidget = new QDockWidget();
+    infoWidget->setWidget(mInfoWidget);
 
-    mModel->setFilename("/home/sacha/test.vcf.gz");
+    addDockWidget(Qt::RightDockWidgetArea, infoWidget);
 
     connect(mSearchEdit,SIGNAL(textChanged(QString)),this,SLOT(setRegion(QString)));
+    connect(mView, SIGNAL(entered(QModelIndex)),this,SLOT(setInfo(QModelIndex)));
 
 }
 
@@ -36,4 +41,15 @@ MainWindow::~MainWindow()
 void MainWindow::setRegion(const QString &region)
 {
     mModel->setRegion(region);
+}
+
+void MainWindow::setInfo(const QModelIndex &index)
+{
+
+    mInfoWidget->setLine(mModel->line(index));
+}
+
+void MainWindow::setFilename(const QString &filename)
+{
+    mModel->setFilename("/home/sacha/test.vcf.gz");
 }

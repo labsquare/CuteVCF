@@ -31,8 +31,11 @@ public:
     void addInfo(const QString& key, const QVariant& value);
     void clearInfo();
 
+    const QHash<QString,QVariant>& infos() const;
+
     void addSampleInfo(const QString& sample, const QString& key, const QVariant& value);
     void clearSample();
+
 
 private:
     QString mChromosom;

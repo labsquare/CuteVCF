@@ -87,6 +87,13 @@ void VcfLine::clearInfo()
     mInfos.clear();
 }
 
+const QHash<QString, QVariant> &VcfLine::infos() const
+{
+    return mInfos;
+}
+
+
+
 void VcfLine::addSampleInfo(const QString &sample, const QString &key, const QVariant &value)
 {
     if (!mSamples.contains(sample))
@@ -100,3 +107,4 @@ void VcfLine::clearSample()
 {
     mSamples.clear();
 }
+

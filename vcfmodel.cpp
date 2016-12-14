@@ -72,8 +72,11 @@ void VcfModel::setRegion(const QString &region)
     beginResetModel();
     mLines.clear();
 
+
     string s_filename = mFilename.toStdString();
     Tabix file(s_filename);
+
+
 
     string s_region(region.toStdString());
     file.setRegion(s_region);
@@ -91,6 +94,18 @@ void VcfModel::setRegion(const QString &region)
         item.setQual(items.at(5).toInt());
         item.setFilter(items.at(6));
 
+        QString info = items.at(7);
+        for (QString i : info.split(";"))
+        {
+            QStringList ipair = i.split("=");
+            if (ipair.size() == 2 )
+            {
+               QString key = ipair[0];
+               QString val = ipair[1];
+               item.addInfo(key,val);
+            }
+
+        }
         mLines.append(item);
     }
 
@@ -106,4 +121,9 @@ QString VcfModel::filename() const
 void VcfModel::setFilename(const QString &filename)
 {
     mFilename = filename;
+}
+
+const VcfLine &VcfModel::line(const QModelIndex &index)
+{
+    return mLines.at(index.row());
 }

@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QtWidgets>
 #include "vcfmodel.h"
+#include "infowidget.h"
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -14,12 +15,14 @@ public:
 
 public slots:
     void setRegion(const QString& region);
+    void setInfo(const QModelIndex& index);
+    void setFilename(const QString& filename);
 
 private:
     QTableView * mView;
     VcfModel * mModel;
     QLineEdit * mSearchEdit;
-
+    InfoWidget * mInfoWidget;
 
 };
 
