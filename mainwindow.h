@@ -17,6 +17,10 @@ public:
 public slots:
     void setRegion(const QString& region);
     void setFilename(const QString& filename);
+    void openFile();
+
+protected:
+    void createMenuBar();
 
 private:
     QTableView * mView;
@@ -24,6 +28,10 @@ private:
     QLineEdit * mSearchEdit;
     InfoWidget * mInfoWidget;
     SampleWidget * mSampleWidget;
+
+     QDockWidget * mInfoDock;
+     QDockWidget * mSampleDock;
+
 
 };
 

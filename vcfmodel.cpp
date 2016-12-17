@@ -48,7 +48,7 @@ QVariant VcfModel::headerData(int section, Qt::Orientation orientation, int role
 {
     if ( orientation == Qt::Horizontal)
     {
-        if (role == Qt::DisplayRole)
+        if (role == Qt::DisplayRole || role == Qt::EditRole)
         {
             switch (section)
             {
@@ -104,11 +104,20 @@ QString VcfModel::filename() const
 void VcfModel::setFilename(const QString &filename)
 {
     mFilename = filename;
+    mChromosomes.clear();
+    mLines.clear();
 
     string s_filename = mFilename.toStdString();
     mTabixFile.setFilename(s_filename);
 
     readHeader();
+
+    for (string chr : mTabixFile.chroms)
+        mChromosomes.append(QString::fromStdString(chr));
+
+    qDebug()<<mChromosomes;
+
+
 
 }
 
@@ -120,4 +129,9 @@ const VcfLine &VcfModel::line(const QModelIndex &index)
 const VcfHeader &VcfModel::header() const
 {
     return mHeader;
+}
+
+const QStringList &VcfModel::chromosoms() const
+{
+    return mChromosomes;
 }

@@ -12,6 +12,7 @@ SampleWidget::SampleWidget(VcfModel * vcfModel,QWidget *parent) : QWidget(parent
 
     mView->setModel(mModel);
     mView->verticalHeader()->hide();
+    mView->horizontalHeader()->hide();
     mView->horizontalHeader()->setSectionResizeMode(1,QHeaderView::Stretch);
     mView->setAlternatingRowColors(true);
 
@@ -44,11 +45,17 @@ void SampleWidget::setSample(int id)
 {
     mModel->clear();
 
+    mView->horizontalHeader()->show();
+    mModel->setHorizontalHeaderLabels(QStringList()<<tr("Key")<<tr("Value"));
+
     QHash<QByteArray, QVariant> samples  = mCurrentLine.sample(id);
     for (QByteArray key : samples.keys()){
 
         QStandardItem * keyItem = new QStandardItem(QString::fromUtf8(key));
         QStandardItem * valItem = new QStandardItem(samples.value(key).toString());
+
+        keyItem->setEditable(false);
+        valItem->setEditable(false);
 
         keyItem->setToolTip(mVcfModel->header().format(key).value("Description").toString());
 

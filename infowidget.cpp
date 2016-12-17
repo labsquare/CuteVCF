@@ -9,6 +9,7 @@ InfoWidget::InfoWidget(VcfModel * vcfModel, QWidget *parent)
     mVcfModel = vcfModel;
 
     mModel->setColumnCount(2);
+    mView->horizontalHeader()->hide();
 
     mView->setModel(mModel);
     mView->verticalHeader()->hide();
@@ -24,6 +25,8 @@ InfoWidget::InfoWidget(VcfModel * vcfModel, QWidget *parent)
 void InfoWidget::setLine(const QModelIndex &index)
 {
     mModel->clear();
+    mModel->setHorizontalHeaderLabels(QStringList()<<tr("Key")<<tr("Value"));
+    mView->horizontalHeader()->show();
 
     VcfLine line = mVcfModel->line(index);
 
@@ -33,6 +36,9 @@ void InfoWidget::setLine(const QModelIndex &index)
 
         QStandardItem * keyItem = new QStandardItem(QString::fromUtf8(key));
         QStandardItem * valItem = new QStandardItem(infos.value(key).toString());
+
+        keyItem->setEditable(false);
+        valItem->setEditable(false);
 
         keyItem->setToolTip(mVcfModel->header().info(key).value("Description").toString());
 

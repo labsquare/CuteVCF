@@ -18,22 +18,26 @@ public:
     const VcfLine& line(const QModelIndex& index);
 
     const VcfHeader& header() const;
+    const QStringList& chromosoms() const;
+
+
 
 
 
 protected:
-     int rowCount(const QModelIndex &parent) const Q_DECL_OVERRIDE;
-     int columnCount(const QModelIndex &parent) const Q_DECL_OVERRIDE;
-     QVariant data(const QModelIndex &index, int role) const Q_DECL_OVERRIDE;
-     QVariant headerData(int section, Qt::Orientation orientation, int role) const Q_DECL_OVERRIDE;
+    int rowCount(const QModelIndex &parent) const Q_DECL_OVERRIDE;
+    int columnCount(const QModelIndex &parent) const Q_DECL_OVERRIDE;
+    QVariant data(const QModelIndex &index, int role) const Q_DECL_OVERRIDE;
+    QVariant headerData(int section, Qt::Orientation orientation, int role) const Q_DECL_OVERRIDE;
 
-     void readHeader();
+    void readHeader();
 
 private:
-     QList<VcfLine> mLines;
-     VcfHeader mHeader;
-     QString mFilename;
-      Tabix mTabixFile;
+    QList<VcfLine> mLines;
+    VcfHeader mHeader;
+    QString mFilename;
+    Tabix mTabixFile;
+    QStringList mChromosomes;
 
 
 

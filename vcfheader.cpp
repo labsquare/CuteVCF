@@ -15,6 +15,10 @@ VcfHeader::VcfHeader(const QByteArray &raw)
 void VcfHeader::setRaw(const QByteArray &raw)
 {
     mRaw = raw;
+    mInfos.clear();
+    mFormats.clear();
+    mColnames.clear();
+
 
     QByteArrayList lines = mRaw.split('\n');
 
