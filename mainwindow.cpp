@@ -26,7 +26,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     QToolBar * mainToolBar = new QToolBar("main toolbar");
-    addToolBar(Qt::BottomToolBarArea, mainToolBar);
+    mainToolBar->setFloatable(false);
+    mainToolBar->setAllowedAreas(Qt::TopToolBarArea);
+    mainToolBar->setMovable(false);
+    addToolBar(Qt::TopToolBarArea, mainToolBar);
 
 
     mainToolBar->addWidget(mSearchEdit);
