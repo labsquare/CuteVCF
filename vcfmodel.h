@@ -2,6 +2,7 @@
 #define VCFMODEL_H
 #include <QtCore>
 #include "vcfline.h"
+#include "vcfheader.h"
 #include "tabix.hpp"
 using namespace  std;
 
@@ -16,6 +17,8 @@ public:
     void setFilename(const QString &filename);
     const VcfLine& line(const QModelIndex& index);
 
+    const VcfHeader& header() const;
+
 
 
 protected:
@@ -24,9 +27,11 @@ protected:
      QVariant data(const QModelIndex &index, int role) const Q_DECL_OVERRIDE;
      QVariant headerData(int section, Qt::Orientation orientation, int role) const Q_DECL_OVERRIDE;
 
+     void readHeader();
 
 private:
      QList<VcfLine> mLines;
+     VcfHeader mHeader;
      QString mFilename;
       Tabix mTabixFile;
 

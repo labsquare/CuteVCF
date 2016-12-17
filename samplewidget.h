@@ -2,13 +2,15 @@
 #define SAMPLEWIDGET_H
 #include <QtWidgets>
 #include "vcfline.h"
+#include "vcfmodel.h"
 class SampleWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit SampleWidget(QWidget *parent = 0);
+    explicit SampleWidget(VcfModel * vcfModel, QWidget *parent = 0);
 
-    void setLine(const VcfLine& line);
+public Q_SLOTS:
+    void setLine(const QModelIndex& index);
 
 protected Q_SLOTS:
     void setSample(int id);
@@ -17,6 +19,7 @@ private:
     QTableView * mView;
     QStandardItemModel * mModel;
     VcfLine mCurrentLine;
+    VcfModel * mVcfModel;
 
 };
 

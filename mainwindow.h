@@ -16,7 +16,6 @@ public:
 
 public slots:
     void setRegion(const QString& region);
-    void setInfo(const QModelIndex& index);
     void setFilename(const QString& filename);
 
 private:

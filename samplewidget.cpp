@@ -1,10 +1,11 @@
 #include "samplewidget.h"
 
-SampleWidget::SampleWidget(QWidget *parent) : QWidget(parent)
+SampleWidget::SampleWidget(VcfModel * vcfModel,QWidget *parent) : QWidget(parent)
 {
     mSampleBox = new QComboBox;
     mView      = new QTableView;
     mModel     = new QStandardItemModel;
+    mVcfModel  = vcfModel;
 
     mView->setModel(mModel);
     mModel->setColumnCount(2);
@@ -25,16 +26,17 @@ SampleWidget::SampleWidget(QWidget *parent) : QWidget(parent)
 
 }
 
-void SampleWidget::setLine(const VcfLine &line)
+void SampleWidget::setLine(const QModelIndex &index)
 {
-    mCurrentLine = line;
+    mCurrentLine = mVcfModel->line(index);
     mSampleBox->clear();
 
-    for (int i=0; i<line.sampleCount(); ++i)
-        mSampleBox->addItem(QString("Sample %1").arg(i));
+    QStringList colnames =  mVcfModel->header().colnames();
+
+    for (int i=9; i<colnames.count(); ++i)
+        mSampleBox->addItem(colnames.at(i));
 
     setSample(0);
-
 
 }
 
@@ -43,11 +45,12 @@ void SampleWidget::setSample(int id)
     mModel->clear();
 
     QHash<QByteArray, QVariant> samples  = mCurrentLine.sample(id);
-
     for (QByteArray key : samples.keys()){
 
         QStandardItem * keyItem = new QStandardItem(QString::fromUtf8(key));
         QStandardItem * valItem = new QStandardItem(samples.value(key).toString());
+
+        keyItem->setToolTip(mVcfModel->header().format(key).value("Description").toString());
 
         QList<QStandardItem*> row ;
         row.append(keyItem);

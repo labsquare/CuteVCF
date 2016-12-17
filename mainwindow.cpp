@@ -6,8 +6,8 @@ MainWindow::MainWindow(QWidget *parent) :
     mView         = new QTableView;
     mModel        = new VcfModel;
     mSearchEdit   = new QLineEdit;
-    mInfoWidget   = new InfoWidget;
-    mSampleWidget = new SampleWidget;
+    mInfoWidget   = new InfoWidget(mModel);
+    mSampleWidget = new SampleWidget(mModel);
 
     mView->setModel(mModel);
     setCentralWidget(mView);
@@ -36,7 +36,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     connect(mSearchEdit,SIGNAL(textChanged(QString)),this,SLOT(setRegion(QString)));
-    connect(mView, SIGNAL(activated(QModelIndex)),this,SLOT(setInfo(QModelIndex)));
+    connect(mView->selectionModel(),SIGNAL(currentRowChanged(QModelIndex,QModelIndex)),mInfoWidget,SLOT(setLine(QModelIndex)));
+    connect(mView->selectionModel(),SIGNAL(currentRowChanged(QModelIndex,QModelIndex)),mSampleWidget,SLOT(setLine(QModelIndex)));
 
 }
 
@@ -49,13 +50,9 @@ void MainWindow::setRegion(const QString &region)
     mModel->setRegion(region);
 }
 
-void MainWindow::setInfo(const QModelIndex &index)
-{
-    mInfoWidget->setLine(mModel->line(index));
-    mSampleWidget->setLine(mModel->line(index));
-}
+
 
 void MainWindow::setFilename(const QString &filename)
 {
-    mModel->setFilename("/home/sacha/missing.vcf.gz");
+    mModel->setFilename("/home/sacha/test.vcf.gz");
 }

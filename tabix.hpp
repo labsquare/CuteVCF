@@ -36,7 +36,7 @@ public:
     ~Tabix(void);
 
     void getHeader(string& header);
-    bool setRegion(string& region);
+    bool setRegion(const string& region);
     bool getNextLine(string& line);
     void setFilename(string& file);
 

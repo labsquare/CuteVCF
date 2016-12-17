@@ -67,13 +67,23 @@ QVariant VcfModel::headerData(int section, Qt::Orientation orientation, int role
     return QVariant();
 }
 
+void VcfModel::readHeader()
+{
+    string header;
+    mTabixFile.getHeader(header);
+    mHeader.setRaw(QByteArray::fromStdString(header));
+
+
+}
+
 void VcfModel::setRegion(const QString &region)
 {
     beginResetModel();
     mLines.clear();
 
     string s_region(region.toStdString());
-    mTabixFile.setRegion(s_region);
+    mTabixFile.setRegion(region.toStdString());
+
     string line;
     while (mTabixFile.getNextLine(line))
     {
@@ -98,9 +108,16 @@ void VcfModel::setFilename(const QString &filename)
     string s_filename = mFilename.toStdString();
     mTabixFile.setFilename(s_filename);
 
+    readHeader();
+
 }
 
 const VcfLine &VcfModel::line(const QModelIndex &index)
 {
     return mLines.at(index.row());
+}
+
+const VcfHeader &VcfModel::header() const
+{
+    return mHeader;
 }

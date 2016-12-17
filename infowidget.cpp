@@ -1,10 +1,12 @@
 #include "infowidget.h"
 
-InfoWidget::InfoWidget(QWidget *parent) : QWidget(parent)
+InfoWidget::InfoWidget(VcfModel * vcfModel, QWidget *parent)
+    : QWidget(parent)
 {
 
-    mModel = new QStandardItemModel;
-    mView  = new QTableView;
+    mModel    = new QStandardItemModel;
+    mView     = new QTableView;
+    mVcfModel = vcfModel;
 
     mModel->setColumnCount(2);
 
@@ -19,9 +21,11 @@ InfoWidget::InfoWidget(QWidget *parent) : QWidget(parent)
 
 }
 
-void InfoWidget::setLine(const VcfLine &line)
+void InfoWidget::setLine(const QModelIndex &index)
 {
     mModel->clear();
+
+    VcfLine line = mVcfModel->line(index);
 
     QHash<QByteArray, QVariant> infos = line.infos();
 
@@ -29,6 +33,8 @@ void InfoWidget::setLine(const VcfLine &line)
 
         QStandardItem * keyItem = new QStandardItem(QString::fromUtf8(key));
         QStandardItem * valItem = new QStandardItem(infos.value(key).toString());
+
+        keyItem->setToolTip(mVcfModel->header().info(key).value("Description").toString());
 
         QList<QStandardItem*> row ;
         row.append(keyItem);

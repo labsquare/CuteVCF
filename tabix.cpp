@@ -29,7 +29,7 @@ void Tabix::getHeader(string& header) {
     iter = tbx_itr_querys(tbx, current_chrom->c_str());
 }
 
-bool Tabix::setRegion(string& region) {
+bool Tabix::setRegion(const string& region) {
     tbx_itr_destroy(iter);
     iter = tbx_itr_querys(tbx, region.c_str());
     has_jumped = true;
