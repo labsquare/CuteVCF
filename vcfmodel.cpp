@@ -50,13 +50,13 @@ QVariant VcfModel::data(const QModelIndex &index, int role) const
     if ( role == Qt::TextColorRole)
     {
         if (index.column() == 3) {
-           if (line.ref().size() == 1)
-               return mBaseColors.value(line.ref().at(0));
+            if (line.ref().size() == 1)
+                return mBaseColors.value(line.ref().at(0));
         }
 
         if (index.column() == 4) {
-           if (line.alt().size() == 1)
-               return mBaseColors.value(line.alt().at(0));
+            if (line.alt().size() == 1)
+                return mBaseColors.value(line.alt().at(0));
         }
     }
 
@@ -178,6 +178,11 @@ void VcfModel::exportCsv(const QString &filename) const
 
     }
 
+}
+
+int VcfModel::count() const
+{
+    return mLines.count();
 }
 
 void VcfModel::clear()

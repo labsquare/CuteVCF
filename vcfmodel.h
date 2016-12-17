@@ -23,7 +23,7 @@ public:
     const QStringList& chromosoms() const;
 
     void exportCsv(const QString& filename) const;
-
+    int count() const;
 
     void clear();
 

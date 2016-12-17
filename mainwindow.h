@@ -31,8 +31,9 @@ private:
     InfoWidget * mInfoWidget;
     SampleWidget * mSampleWidget;
 
-     QDockWidget * mInfoDock;
-     QDockWidget * mSampleDock;
+    QDockWidget * mInfoDock;
+    QDockWidget * mSampleDock;
+    QLabel * mVariantCount;
 
 
 };

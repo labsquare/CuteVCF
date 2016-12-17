@@ -8,6 +8,7 @@ MainWindow::MainWindow(QWidget *parent) :
     mSearchEdit   = new QLineEdit;
     mInfoWidget   = new InfoWidget(mModel);
     mSampleWidget = new SampleWidget(mModel);
+    mVariantCount = new QLabel(this);
 
     mView->setModel(mModel);
     setCentralWidget(mView);
@@ -19,6 +20,8 @@ MainWindow::MainWindow(QWidget *parent) :
     mSearchEdit->setPlaceholderText(tr("Write the region to select in format <chr> or <chr:start-end>"));
     mSearchEdit->setCompleter(new QCompleter);
     mSearchEdit->completer()->setCaseSensitivity(Qt::CaseInsensitive);
+
+    statusBar()->addPermanentWidget(mVariantCount);
 
 
 
@@ -60,6 +63,12 @@ MainWindow::~MainWindow()
 void MainWindow::setRegion(const QString &region)
 {
     mModel->setRegion(region);
+
+    if (mModel->count() == 0)
+        mVariantCount->setText(QString());
+    else
+
+        mVariantCount->setText(QString("Total: %1").arg(mModel->count()));
 }
 
 
@@ -130,6 +139,7 @@ void MainWindow::exportCsv()
     mModel->exportCsv(fileName);
 
 }
+
 
 void MainWindow::createMenuBar()
 {
