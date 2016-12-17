@@ -11,6 +11,7 @@ public:
 
 public Q_SLOTS:
     void setLine(const QModelIndex& index);
+    void clear();
 
 protected Q_SLOTS:
     void setSample(int id);

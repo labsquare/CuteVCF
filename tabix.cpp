@@ -4,7 +4,7 @@ Tabix::Tabix(void) { }
 
 Tabix::Tabix(string& file) {
 
-
+    setFilename(file);
 }
 
 Tabix::~Tabix(void) {
@@ -66,6 +66,7 @@ bool Tabix::getNextLine(string& line) {
 
 void Tabix::setFilename(string &file)
 {
+    chroms.clear();
     has_jumped = false;
     filename = file;
     str.l = 0;

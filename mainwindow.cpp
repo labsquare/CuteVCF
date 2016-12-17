@@ -64,6 +64,11 @@ void MainWindow::setRegion(const QString &region)
 
 void MainWindow::setFilename(const QString &filename)
 {
+    mInfoWidget->clear();
+    mSampleWidget->clear();
+    mModel->clear();
+    mSearchEdit->clear();
+
     mModel->setFilename(filename);
     mSearchEdit->completer()->setModel(new QStringListModel(mModel->chromosoms()));
 

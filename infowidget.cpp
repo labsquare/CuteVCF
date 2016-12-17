@@ -53,3 +53,8 @@ void InfoWidget::setLine(const QModelIndex &index)
     mView->horizontalHeader()->setSectionResizeMode(1,QHeaderView::Stretch);
 
 }
+
+void InfoWidget::clear()
+{
+    mModel->clear();
+}

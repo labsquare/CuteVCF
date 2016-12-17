@@ -69,3 +69,8 @@ void SampleWidget::setSample(int id)
     mView->horizontalHeader()->setSectionResizeMode(1,QHeaderView::Stretch);
 
 }
+
+void SampleWidget::clear()
+{
+    mModel->clear();
+}

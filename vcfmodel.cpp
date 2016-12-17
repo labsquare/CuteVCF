@@ -135,3 +135,9 @@ const QStringList &VcfModel::chromosoms() const
 {
     return mChromosomes;
 }
+
+void VcfModel::clear()
+{
+    mLines.clear();
+    mChromosomes.clear();
+}

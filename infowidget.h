@@ -13,6 +13,7 @@ public:
     explicit InfoWidget(VcfModel * vcfModel, QWidget *parent = 0);
 public Q_SLOTS:
     void setLine(const QModelIndex& index);
+    void clear();
 
 private:
     QStandardItemModel * mModel;

@@ -21,7 +21,7 @@ public:
     const QStringList& chromosoms() const;
 
 
-
+    void clear();
 
 
 protected:
