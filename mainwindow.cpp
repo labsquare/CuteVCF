@@ -49,6 +49,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     resize(800,600);
 
+
+
 }
 
 MainWindow::~MainWindow()
@@ -94,6 +96,11 @@ void MainWindow::createMenuBar()
     QMenu * fileMenu = bar->addMenu(tr("&File"));
     fileMenu->addAction(tr("Open of vcf file"),this,SLOT(openFile()),QKeySequence::Open);
     fileMenu->addAction(tr("Close"),qApp, SLOT(closeAllWindows()), QKeySequence::Quit);
+
+    // Edit menu
+    QMenu * editMenu = bar->addMenu(tr("&Edit"));
+    editMenu->addAction(tr("Set region ..."), mSearchEdit, SLOT(selectAll()), QKeySequence::Find);
+
 
     // Window menu
     QMenu * viewMenu = bar->addMenu(tr("&Window"));

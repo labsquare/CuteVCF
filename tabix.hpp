@@ -32,7 +32,6 @@ public:
     vector<string> chroms;
 
     Tabix(void);
-    Tabix(string& file);
     ~Tabix(void);
 
     void getHeader(string& header);

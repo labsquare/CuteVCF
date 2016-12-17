@@ -1,11 +1,9 @@
 #include "tabix.hpp"
 
-Tabix::Tabix(void) { }
-
-Tabix::Tabix(string& file) {
-
-    setFilename(file);
+Tabix::Tabix(void) {
 }
+
+
 
 Tabix::~Tabix(void) {
     tbx_itr_destroy(iter);
@@ -30,6 +28,10 @@ void Tabix::getHeader(string& header) {
 }
 
 bool Tabix::setRegion(const string& region) {
+
+    if (!tbx)
+        return false;
+
     tbx_itr_destroy(iter);
     iter = tbx_itr_querys(tbx, region.c_str());
     has_jumped = true;

@@ -28,7 +28,7 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    tabix.cpp \
+    qtabix.cpp \
     vcfmodel.cpp \
     vcfline.cpp \
     infowidget.cpp \
@@ -36,7 +36,7 @@ SOURCES += main.cpp\
     vcfheader.cpp
 
 HEADERS  += mainwindow.h \
-    tabix.hpp \
+    qtabix.h \
     vcfmodel.h \
     vcfline.h \
     infowidget.h \

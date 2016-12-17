@@ -3,7 +3,7 @@
 #include <QtCore>
 #include "vcfline.h"
 #include "vcfheader.h"
-#include "tabix.hpp"
+#include "qtabix.h"
 using namespace  std;
 
 class VcfModel : public QAbstractListModel
@@ -30,14 +30,12 @@ protected:
     QVariant data(const QModelIndex &index, int role) const Q_DECL_OVERRIDE;
     QVariant headerData(int section, Qt::Orientation orientation, int role) const Q_DECL_OVERRIDE;
 
-    void readHeader();
 
 private:
     QList<VcfLine> mLines;
     VcfHeader mHeader;
     QString mFilename;
-    Tabix mTabixFile;
-    QStringList mChromosomes;
+    QTabix mTabixFile;
 
 
 

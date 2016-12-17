@@ -13,7 +13,8 @@ int VcfModel::rowCount(const QModelIndex &parent) const
 
 int VcfModel::columnCount(const QModelIndex &parent) const
 {
-    return 7;
+
+        return 7;
 }
 
 QVariant VcfModel::data(const QModelIndex &index, int role) const
@@ -67,30 +68,21 @@ QVariant VcfModel::headerData(int section, Qt::Orientation orientation, int role
     return QVariant();
 }
 
-void VcfModel::readHeader()
-{
-    string header;
-    mTabixFile.getHeader(header);
-    mHeader.setRaw(QByteArray::fromStdString(header));
 
-
-}
 
 void VcfModel::setRegion(const QString &region)
 {
     beginResetModel();
     mLines.clear();
 
-    string s_region(region.toStdString());
-    mTabixFile.setRegion(region.toStdString());
+    mTabixFile.setRegion(region);
 
-    string line;
-    while (mTabixFile.getNextLine(line))
+    QByteArray line;
+    while (mTabixFile.readLineInto(line))
     {
-        VcfLine item = VcfLine::fromLine(QByteArray::fromStdString(line));
+        VcfLine item = VcfLine::fromLine(line);
         mLines.append(item);
     }
-
 
     endResetModel();
 }
@@ -104,18 +96,11 @@ QString VcfModel::filename() const
 void VcfModel::setFilename(const QString &filename)
 {
     mFilename = filename;
-    mChromosomes.clear();
     mLines.clear();
+    mTabixFile.setFilename(filename);
+    mHeader.setRaw(mTabixFile.header());
 
-    string s_filename = mFilename.toStdString();
-    mTabixFile.setFilename(s_filename);
 
-    readHeader();
-
-    for (string chr : mTabixFile.chroms)
-        mChromosomes.append(QString::fromStdString(chr));
-
-    qDebug()<<mChromosomes;
 
 
 
@@ -133,11 +118,11 @@ const VcfHeader &VcfModel::header() const
 
 const QStringList &VcfModel::chromosoms() const
 {
-    return mChromosomes;
+    return mTabixFile.chromosoms();
 }
 
 void VcfModel::clear()
 {
     mLines.clear();
-    mChromosomes.clear();
+
 }
