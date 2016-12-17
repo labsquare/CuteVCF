@@ -1,6 +1,8 @@
 #ifndef VCFMODEL_H
 #define VCFMODEL_H
 #include <QtCore>
+#include <QIcon>
+#include <QFont>
 #include "vcfline.h"
 #include "vcfheader.h"
 #include "qtabix.h"
@@ -38,6 +40,7 @@ private:
     VcfHeader mHeader;
     QString mFilename;
     QTabix mTabixFile;
+    QHash<char, QColor> mBaseColors;
 
 
 

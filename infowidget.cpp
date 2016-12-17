@@ -10,7 +10,7 @@ InfoWidget::InfoWidget(VcfModel * vcfModel, QWidget *parent)
 
     mModel->setColumnCount(2);
     mView->horizontalHeader()->hide();
-
+    mView->setSelectionBehavior(QAbstractItemView::SelectRows);
     mView->setModel(mModel);
     mView->verticalHeader()->hide();
     mView->horizontalHeader()->setSectionResizeMode(1,QHeaderView::Stretch);

@@ -43,4 +43,7 @@ HEADERS  += mainwindow.h \
     samplewidget.h \
     vcfheader.h
 
+RESOURCES += \
+    icons/icons.qrc
+
 

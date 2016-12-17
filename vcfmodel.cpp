@@ -4,6 +4,11 @@ VcfModel::VcfModel(QObject * parent):
     QAbstractListModel(parent)
 {
 
+    mBaseColors['A'] = QColor("#71E096");
+    mBaseColors['C'] = QColor("#668DE5");
+    mBaseColors['G'] = QColor("#4E4E56");
+    mBaseColors['T'] = QColor("#ed6d79");
+
 }
 
 int VcfModel::rowCount(const QModelIndex &parent) const
@@ -22,11 +27,11 @@ QVariant VcfModel::data(const QModelIndex &index, int role) const
     if (!index.isValid())
         return QVariant();
 
+    VcfLine line = mLines.at(index.row());
+
+
     if ( role == Qt::DisplayRole)
     {
-
-        VcfLine line = mLines.at(index.row());
-
         switch (index.column())
         {
         case 0 : return line.chromosom();
@@ -40,6 +45,36 @@ QVariant VcfModel::data(const QModelIndex &index, int role) const
 
         }
 
+    }
+
+    if ( role == Qt::TextColorRole)
+    {
+        if (index.column() == 3) {
+           if (line.ref().size() == 1)
+               return mBaseColors.value(line.ref().at(0));
+        }
+
+        if (index.column() == 4) {
+           if (line.alt().size() == 1)
+               return mBaseColors.value(line.alt().at(0));
+        }
+    }
+
+    if (role == Qt::FontRole && (index.column() == 3 || index.column()==4))
+    {
+        QFont font;
+        font.setBold(true);
+        return font;
+    }
+
+
+
+
+
+    if (role == Qt::DecorationRole)
+    {
+        if (index.column() == 0)
+            return QIcon(":/dna.png");
     }
 
     return QVariant();
@@ -67,7 +102,6 @@ QVariant VcfModel::headerData(int section, Qt::Orientation orientation, int role
     }
     return QVariant();
 }
-
 
 
 void VcfModel::setRegion(const QString &region)

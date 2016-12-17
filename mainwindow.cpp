@@ -97,6 +97,10 @@ void MainWindow::setFilename(const QString &filename)
         if (!mModel->chromosoms().isEmpty()){
             mSearchEdit->setText(mModel->chromosoms().first());
             setRegion(mModel->chromosoms().first());
+
+            statusBar()->showMessage(QString("%1 loaded").arg(filename));
+            QFileInfo info(filename);
+            setWindowTitle(info.fileName());
         }
     }
     else
@@ -112,7 +116,6 @@ void MainWindow::openFile()
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open Vcf file"), QDir::homePath(), tr("Vcf Files (*.vcf.gz)"));
     setFilename(fileName);
 
-    statusBar()->showMessage("File loaded");
 }
 
 void MainWindow::searchRegion()

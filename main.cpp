@@ -12,9 +12,14 @@ int main(int argc, char *argv[])
 
     QApplication app(argc, argv);
 
-        MainWindow win;
+    QCoreApplication::setApplicationName("CuteVCF");
+    QCoreApplication::setOrganizationDomain("labsquare.org");
+    QCoreApplication::setOrganizationName("labsquare");
 
-        win.show();
+
+    MainWindow win;
+
+    win.show();
 
     app.exec();
 

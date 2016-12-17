@@ -15,7 +15,7 @@ SampleWidget::SampleWidget(VcfModel * vcfModel,QWidget *parent) : QWidget(parent
     mView->horizontalHeader()->hide();
     mView->horizontalHeader()->setSectionResizeMode(1,QHeaderView::Stretch);
     mView->setAlternatingRowColors(true);
-
+    mView->setSelectionBehavior(QAbstractItemView::SelectRows);
     QVBoxLayout * cLayout = new QVBoxLayout;
     cLayout->addWidget(mSampleBox);
     cLayout->addWidget(mView);
