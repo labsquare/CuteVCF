@@ -36,6 +36,8 @@ const QString &QTabix::filename() const
 bool QTabix::setFilename(const QString &filename)
 {
     mFilename  = filename;
+    mChromosoms.clear();
+    mHeaders.clear();
     has_jumped = false;
     // Open file
     fn = hts_open(mFilename.toStdString().c_str(),"r");
@@ -115,6 +117,13 @@ bool QTabix::readLineInto(QByteArray &line)
         }
     }
     return false;
+}
+
+void QTabix::buildIndex(const QString &filename)
+{
+    tbx_conf_t conf = tbx_conf_vcf;
+    int min_shift = 0;
+    tbx_index_build(filename.toStdString().c_str(), min_shift, &conf);
 }
 
 void QTabix::readHeader()

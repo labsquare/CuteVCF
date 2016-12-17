@@ -14,7 +14,7 @@ int VcfModel::rowCount(const QModelIndex &parent) const
 int VcfModel::columnCount(const QModelIndex &parent) const
 {
 
-        return 7;
+    return 7;
 }
 
 QVariant VcfModel::data(const QModelIndex &index, int role) const
@@ -93,13 +93,16 @@ QString VcfModel::filename() const
     return mFilename;
 }
 
-void VcfModel::setFilename(const QString &filename)
+bool VcfModel::setFilename(const QString &filename)
 {
     mFilename = filename;
     mLines.clear();
-    mTabixFile.setFilename(filename);
-    mHeader.setRaw(mTabixFile.header());
+    bool success = mTabixFile.setFilename(filename);
 
+    if (success)
+        mHeader.setRaw(mTabixFile.header());
+
+    return success;
 
 
 
@@ -119,6 +122,28 @@ const VcfHeader &VcfModel::header() const
 const QStringList &VcfModel::chromosoms() const
 {
     return mTabixFile.chromosoms();
+}
+
+void VcfModel::exportCsv(const QString &filename) const
+{
+    QFile file(filename);
+
+    if (file.open(QIODevice::WriteOnly))
+    {
+        QTextStream stream(&file);
+
+        for (VcfLine line : mLines)
+        {
+
+            stream<<line.chromosom()<<"\t"<<line.position()<<"\t"<<line.id()<<"\t"<<line.ref()<<"\t";
+            stream<<line.alt()<<"\t"<<line.qual()<<"\t"<<line.filter();
+            stream<<"\n";
+
+        }
+        file.close();
+
+    }
+
 }
 
 void VcfModel::clear()

@@ -14,11 +14,13 @@ public:
 
     void setRegion(const QString& region);
     QString filename() const;
-    void setFilename(const QString &filename);
+    bool setFilename(const QString &filename);
     const VcfLine& line(const QModelIndex& index);
 
     const VcfHeader& header() const;
     const QStringList& chromosoms() const;
+
+    void exportCsv(const QString& filename) const;
 
 
     void clear();

@@ -14,10 +14,12 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-public slots:
+public Q_SLOTS:
     void setRegion(const QString& region);
     void setFilename(const QString& filename);
     void openFile();
+    void searchRegion();
+    void exportCsv();
 
 protected:
     void createMenuBar();

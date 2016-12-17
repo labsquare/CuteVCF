@@ -24,6 +24,8 @@ public:
 
     bool readLineInto(QByteArray& line);
 
+    static void buildIndex(const QString& filename);
+
 
 protected:
     void readHeader();

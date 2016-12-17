@@ -66,26 +66,66 @@ void MainWindow::setRegion(const QString &region)
 
 void MainWindow::setFilename(const QString &filename)
 {
-    mInfoWidget->clear();
-    mSampleWidget->clear();
-    mModel->clear();
-    mSearchEdit->clear();
+    if (filename.isEmpty())
+        return;
 
-    mModel->setFilename(filename);
-    mSearchEdit->completer()->setModel(new QStringListModel(mModel->chromosoms()));
 
-    if (!mModel->chromosoms().isEmpty()){
-        mSearchEdit->setText(mModel->chromosoms().first());
-        setRegion(mModel->chromosoms().first());
+    if (!QFile::exists(filename+QString(".tbi"))){
+
+        int ret = QMessageBox::question(this,tr("index is missing"),tr("Index file doesn't exist. Would you like to create it ?"));
+        if (ret == QMessageBox::Yes)
+        {
+            QTabix::buildIndex(filename);
+        }
+
+        else
+            return;
+
+    }
+
+
+
+    if (mModel->setFilename(filename))
+    {
+
+        mInfoWidget->clear();
+        mSampleWidget->clear();
+        mModel->clear();
+        mSearchEdit->clear();
+
+        mSearchEdit->completer()->setModel(new QStringListModel(mModel->chromosoms()));
+        if (!mModel->chromosoms().isEmpty()){
+            mSearchEdit->setText(mModel->chromosoms().first());
+            setRegion(mModel->chromosoms().first());
+        }
     }
     else
-        qWarning()<<Q_FUNC_INFO<<"Cannot find chromosoms";
+    {
+        QMessageBox::warning(this,tr("cannot open"),"Cannot open the file");
+    }
+
+
 }
 
 void MainWindow::openFile()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open Vcf file"), QDir::homePath(), tr("Vcf Files (*.vcf.gz)"));
     setFilename(fileName);
+
+    statusBar()->showMessage("File loaded");
+}
+
+void MainWindow::searchRegion()
+{
+    mSearchEdit->selectAll();
+    mSearchEdit->setFocus();
+}
+
+void MainWindow::exportCsv()
+{
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Open Vcf file"), QDir::homePath(), tr("Csv file(*.csv)"));
+    mModel->exportCsv(fileName);
+
 }
 
 void MainWindow::createMenuBar()
@@ -95,11 +135,12 @@ void MainWindow::createMenuBar()
     // File menu
     QMenu * fileMenu = bar->addMenu(tr("&File"));
     fileMenu->addAction(tr("Open of vcf file"),this,SLOT(openFile()),QKeySequence::Open);
+    fileMenu->addAction(tr("Export to CSV"),this,SLOT(exportCsv()),QKeySequence::Save);
     fileMenu->addAction(tr("Close"),qApp, SLOT(closeAllWindows()), QKeySequence::Quit);
 
     // Edit menu
     QMenu * editMenu = bar->addMenu(tr("&Edit"));
-    editMenu->addAction(tr("Set region ..."), mSearchEdit, SLOT(selectAll()), QKeySequence::Find);
+    editMenu->addAction(tr("Set region ..."), this, SLOT(searchRegion()), QKeySequence::Find);
 
 
     // Window menu
