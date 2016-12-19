@@ -33,7 +33,8 @@ SOURCES += main.cpp\
     vcfline.cpp \
     infowidget.cpp \
     samplewidget.cpp \
-    vcfheader.cpp
+    vcfheader.cpp \
+    aboutdialog.cpp
 
 HEADERS  += mainwindow.h \
     qtabix.h \
@@ -41,7 +42,8 @@ HEADERS  += mainwindow.h \
     vcfline.h \
     infowidget.h \
     samplewidget.h \
-    vcfheader.h
+    vcfheader.h \
+    aboutdialog.h
 
 RESOURCES += \
     icons/icons.qrc

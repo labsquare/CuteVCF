@@ -1,5 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file>dna.png</file>
+        <file>search.png</file>
+        <file>app.png</file>
     </qresource>
 </RCC>

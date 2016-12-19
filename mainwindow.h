@@ -6,6 +6,7 @@
 #include "vcfmodel.h"
 #include "infowidget.h"
 #include "samplewidget.h"
+#include "aboutdialog.h"
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -20,6 +21,7 @@ public Q_SLOTS:
     void openFile();
     void searchRegion();
     void exportCsv();
+    void showAbout();
 
 protected:
     void createMenuBar();
@@ -34,6 +36,7 @@ private:
     QDockWidget * mInfoDock;
     QDockWidget * mSampleDock;
     QLabel * mVariantCount;
+
 
 
 };

@@ -10,6 +10,8 @@ MainWindow::MainWindow(QWidget *parent) :
     mSampleWidget = new SampleWidget(mModel);
     mVariantCount = new QLabel(this);
 
+    setWindowIcon(QIcon(":/app.png"));
+
     mView->setModel(mModel);
     setCentralWidget(mView);
 
@@ -20,7 +22,7 @@ MainWindow::MainWindow(QWidget *parent) :
     mSearchEdit->setPlaceholderText(tr("Write the region to select in format <chr> or <chr:start-end>"));
     mSearchEdit->setCompleter(new QCompleter);
     mSearchEdit->completer()->setCaseSensitivity(Qt::CaseInsensitive);
-
+    mSearchEdit->addAction(QIcon::fromTheme("system-search"),QLineEdit::LeadingPosition);
     statusBar()->addPermanentWidget(mVariantCount);
 
 
@@ -143,6 +145,12 @@ void MainWindow::exportCsv()
 
 }
 
+void MainWindow::showAbout()
+{
+    AboutDialog dialog;
+    dialog.exec();
+}
+
 
 void MainWindow::createMenuBar()
 {
@@ -150,9 +158,9 @@ void MainWindow::createMenuBar()
 
     // File menu
     QMenu * fileMenu = bar->addMenu(tr("&File"));
-    fileMenu->addAction(tr("Open of vcf file"),this,SLOT(openFile()),QKeySequence::Open);
-    fileMenu->addAction(tr("Export to CSV"),this,SLOT(exportCsv()),QKeySequence::Save);
-    fileMenu->addAction(tr("Close"),qApp, SLOT(closeAllWindows()), QKeySequence::Quit);
+    fileMenu->addAction(QIcon::fromTheme("document-open"), tr("Open of vcf file"),this,SLOT(openFile()),QKeySequence::Open);
+    fileMenu->addAction(QIcon::fromTheme("document-save-as"),tr("Export to CSV"),this,SLOT(exportCsv()),QKeySequence::Save);
+    fileMenu->addAction(QIcon::fromTheme("application-exit"),tr("Close"),qApp, SLOT(closeAllWindows()), QKeySequence::Quit);
 
     // Edit menu
     QMenu * editMenu = bar->addMenu(tr("&Edit"));
@@ -171,7 +179,8 @@ void MainWindow::createMenuBar()
 
     // Help menu
     QMenu * helpMenu = bar->addMenu(tr("&Help"));
-    helpMenu->addAction(tr("About Qt"),qApp,SLOT(aboutQt()));
+    helpMenu->addAction(QIcon::fromTheme("help-about"),tr("About %1").arg(qApp->applicationName()),this,SLOT(showAbout()));
+    helpMenu->addAction(QIcon::fromTheme("help-about"),tr("About Qt"),qApp,SLOT(aboutQt()));
 
 
     setMenuBar(bar);
