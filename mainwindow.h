@@ -16,10 +16,10 @@ public:
     ~MainWindow();
 
 public Q_SLOTS:
-    void setRegion(const QString& region);
+    void filterRegion();
     void setFilename(const QString& filename);
     void openFile();
-    void searchRegion();
+    void focusRegionEdit();
     void exportCsv();
     void showAbout();
 

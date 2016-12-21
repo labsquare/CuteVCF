@@ -48,7 +48,7 @@ MainWindow::MainWindow(QWidget *parent) :
     addDockWidget(Qt::RightDockWidgetArea, mSampleDock);
 
 
-    connect(mSearchEdit,SIGNAL(textChanged(QString)),this,SLOT(setRegion(QString)));
+    connect(mSearchEdit,SIGNAL(returnPressed()),this,SLOT(filterRegion()));
     connect(mView->selectionModel(),SIGNAL(currentRowChanged(QModelIndex,QModelIndex)),mInfoWidget,SLOT(setLine(QModelIndex)));
     connect(mView->selectionModel(),SIGNAL(currentRowChanged(QModelIndex,QModelIndex)),mSampleWidget,SLOT(setLine(QModelIndex)));
 
@@ -65,8 +65,9 @@ MainWindow::~MainWindow()
 {
 }
 
-void MainWindow::setRegion(const QString &region)
+void MainWindow::filterRegion()
 {
+    QString region = mSearchEdit->text();
     mModel->setRegion(region);
 
     if (mModel->count() == 0)
@@ -110,7 +111,7 @@ void MainWindow::setFilename(const QString &filename)
         mSearchEdit->completer()->setModel(new QStringListModel(mModel->chromosoms()));
         if (!mModel->chromosoms().isEmpty()){
             mSearchEdit->setText(mModel->chromosoms().first());
-            setRegion(mModel->chromosoms().first());
+            filterRegion();
 
             statusBar()->showMessage(QString("%1 loaded").arg(filename));
             QFileInfo info(filename);
@@ -132,7 +133,7 @@ void MainWindow::openFile()
 
 }
 
-void MainWindow::searchRegion()
+void MainWindow::focusRegionEdit()
 {
     mSearchEdit->selectAll();
     mSearchEdit->setFocus();
@@ -164,7 +165,7 @@ void MainWindow::createMenuBar()
 
     // Edit menu
     QMenu * editMenu = bar->addMenu(tr("&Edit"));
-    editMenu->addAction(tr("Set region ..."), this, SLOT(searchRegion()), QKeySequence::Find);
+    editMenu->addAction(tr("Set region ..."), this, SLOT(focusRegionEdit()), QKeySequence::Find);
 
 
     // Window menu
