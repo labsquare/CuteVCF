@@ -11,6 +11,7 @@ class QTabix
 public:
     explicit QTabix();
     explicit QTabix(const QString& filename);
+    ~QTabix();
 
     bool setRegion(const QString& region);
     const QString& region() const;
@@ -35,11 +36,12 @@ private:
     QStringList mChromosoms;
     QByteArray mHeaders;
     QString mRegions;
-    htsFile* fn = nullptr;
-    tbx_t* tbx  = nullptr;
-    hts_itr_t* iter =nullptr;
+    htsFile* fp = NULL;
+    tbx_t* tbx  = NULL;
+    hts_itr_t* iter =NULL;
     bool has_jumped;
     const tbx_conf_t *idxconf;
+    kstring_t str;
 
 
 };

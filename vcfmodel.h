@@ -7,6 +7,9 @@
 #include "vcfline.h"
 #include "vcfheader.h"
 #include "qtabix.h"
+
+#define MAX_ITEMS 100000
+
 using namespace  std;
 
 class VcfModel : public QAbstractListModel
@@ -27,6 +30,7 @@ public:
 
     void exportCsv(const QString& filename) const;
     int count() const;
+    quint64 realCount() const;
 
     void clear();
 
@@ -49,7 +53,9 @@ protected:
     void setLoading(bool enable);
 
 private:
-    QList<VcfLine> mLines;
+    QVector<VcfLine> mLines;
+    QVector<VcfLine> mTampons;
+
     VcfHeader mHeader;
     QString mFilename;
     QTabix mTabixFile;
@@ -58,6 +64,7 @@ private:
     QFuture<void> mFuture;
     QFutureWatcher<void> mFutureWatcher;
     bool mLoading;
+    quint64 mRealCount;
 
 
 

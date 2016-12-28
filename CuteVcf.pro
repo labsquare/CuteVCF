@@ -8,11 +8,11 @@ QT       += core gui concurrent
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-
+# On linux, compile htslib
+unix {
 mytarget.target = $$PWD/htslib/libhts.so
 mytarget.commands = cd $$PWD/htslib; make -j4
 mytarget_clean.commands = cd $$PWD/htslib; make clean
-
 QMAKE_EXTRA_TARGETS += mytarget
 PRE_TARGETDEPS += $$PWD/htslib/libhts.so
 INCLUDEPATH+=$$PWD/htslib
@@ -20,7 +20,15 @@ LIBS += -L$$PWD/htslib -lhts
 
 TARGET =  CuteVcf
 TEMPLATE = app
+}
 
+# On windows use libhts.a made from msys2.
+win32{
+LIBS += -L$$PWD/win32 -lhts
+
+INCLUDEPATH += $$PWD/htslib
+DEPENDPATH += $$PWD/htslib
+}
 
 
 

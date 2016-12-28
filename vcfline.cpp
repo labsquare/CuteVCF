@@ -2,13 +2,18 @@
 
 VcfLine::VcfLine()
 {
-
+    mChromosom="chr3";
+    mPosition = 10;
 }
 
 VcfLine VcfLine::fromLine(const QByteArray &line)
 {
+
     VcfLine out;
     QByteArrayList lines = line.split(QChar::Tabulation);
+
+
+
     out.setChromosom(lines.at(0));
     out.setPosition(lines.at(1).toUInt());
     out.setId(lines.at(2));
@@ -17,7 +22,8 @@ VcfLine VcfLine::fromLine(const QByteArray &line)
     out.setQual(lines.at(5).toInt());
     out.setFilter(lines.at(6));
     out.setRawInfos(lines.at(7));
-    out.setRawFormat(lines.at(8));
+
+//    out.setRawFormat(lines.value(8));
 
     for (int i=9; i<lines.count(); ++i)
         out.addRawSample(lines.at(i));

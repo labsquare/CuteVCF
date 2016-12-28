@@ -9,6 +9,7 @@ VcfModel::VcfModel(QObject * parent):
     mBaseColors['G'] = QColor("#4E4E56");
     mBaseColors['T'] = QColor("#ed6d79");
 
+    connect(&mFutureWatcher, SIGNAL(finished()), this,SLOT(loaded()));
 
 }
 
@@ -68,10 +69,6 @@ QVariant VcfModel::data(const QModelIndex &index, int role) const
         return font;
     }
 
-
-
-
-
     if (role == Qt::DecorationRole)
     {
         if (index.column() == 0)
@@ -107,19 +104,22 @@ QVariant VcfModel::headerData(int section, Qt::Orientation orientation, int role
 void VcfModel::load()
 {
     setLoading(true);
-    beginResetModel();
-    mLines.clear();
-
-    mTabixFile.setRegion(mRegion);
+    mTampons.clear();
 
     QByteArray line;
+    mRealCount = 0;
     while (mTabixFile.readLineInto(line))
     {
-        VcfLine item = VcfLine::fromLine(line);
-        mLines.append(item);
+        if (mRealCount < MAX_ITEMS)
+        {
+            VcfLine item = VcfLine::fromLine(line) ;
+            mTampons.append(item);
+        }
+        mRealCount++;
+
+
     }
 
-    endResetModel();
     setLoading(false);
 
 }
@@ -135,17 +135,14 @@ void VcfModel::setRegion(const QString &region)
 {
     mFuture.cancel();
     mFuture.waitForFinished();
-
-    mRegion = region;
+    mTabixFile.setRegion(region);
     mFuture = QtConcurrent::run(this, &VcfModel::load);
     mFutureWatcher.setFuture(mFuture);
-
 
 }
 
 QString VcfModel::filename() const
 {
-
     return mFilename;
 }
 
@@ -204,6 +201,11 @@ int VcfModel::count() const
     return mLines.count();
 }
 
+quint64 VcfModel::realCount() const
+{
+    return mRealCount;
+}
+
 void VcfModel::clear()
 {
     mLines.clear();
@@ -217,6 +219,11 @@ bool VcfModel::isLoading() const
 
 void VcfModel::loaded()
 {
+    beginResetModel();
+
+    mLines.swap(mTampons);
+
+    endResetModel();
 
 }
 

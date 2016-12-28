@@ -108,7 +108,7 @@ void MainWindow::setFilename(const QString &filename)
             mSearchEdit->completer()->setModel(new QStringListModel(mModel->chromosoms()));
 
             // by defaut, set to the chromosom 1
-            mSearchEdit->setText(mModel->chromosoms().first());
+            mSearchEdit->setText(mModel->chromosoms().last());
 
             loadRegion();
 
@@ -216,7 +216,7 @@ void MainWindow::loadingChanged()
     }
     else{
         mLoadingAnimation->stop();
-        mVariantCount->setText(QString("Total: %1").arg(mModel->count()));
+        mVariantCount->setText(QString("Total: %1").arg(mModel->realCount()));
 
     }
 
