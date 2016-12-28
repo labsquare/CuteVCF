@@ -3,6 +3,7 @@
 #include <QtCore>
 #include <QIcon>
 #include <QFont>
+#include <QtConcurrent>
 #include "vcfline.h"
 #include "vcfheader.h"
 #include "qtabix.h"
@@ -10,6 +11,8 @@ using namespace  std;
 
 class VcfModel : public QAbstractListModel
 {
+    Q_OBJECT
+    Q_PROPERTY(bool loading READ isLoading WRITE setLoading NOTIFY loadingChanged)
 public:
 
     VcfModel(QObject * parent = Q_NULLPTR);
@@ -27,6 +30,14 @@ public:
 
     void clear();
 
+    bool isLoading() const;
+
+Q_SIGNALS:
+    void loadingChanged();
+
+
+protected Q_SLOTS:
+    void loaded();
 
 protected:
     int rowCount(const QModelIndex &parent) const Q_DECL_OVERRIDE;
@@ -34,6 +45,8 @@ protected:
     QVariant data(const QModelIndex &index, int role) const Q_DECL_OVERRIDE;
     QVariant headerData(int section, Qt::Orientation orientation, int role) const Q_DECL_OVERRIDE;
 
+    void load();
+    void setLoading(bool enable);
 
 private:
     QList<VcfLine> mLines;
@@ -41,6 +54,10 @@ private:
     QString mFilename;
     QTabix mTabixFile;
     QHash<char, QColor> mBaseColors;
+    QString mRegion;
+    QFuture<void> mFuture;
+    QFutureWatcher<void> mFutureWatcher;
+    bool mLoading;
 
 
 

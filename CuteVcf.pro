@@ -34,7 +34,8 @@ SOURCES += main.cpp\
     infowidget.cpp \
     samplewidget.cpp \
     vcfheader.cpp \
-    aboutdialog.cpp
+    aboutdialog.cpp \
+    createindexdialog.cpp
 
 HEADERS  += mainwindow.h \
     qtabix.h \
@@ -43,9 +44,13 @@ HEADERS  += mainwindow.h \
     infowidget.h \
     samplewidget.h \
     vcfheader.h \
-    aboutdialog.h
+    aboutdialog.h \
+    createindexdialog.h
 
 RESOURCES += \
     icons/icons.qrc
+
+DISTFILES += \
+    icons/squares.gif
 
 

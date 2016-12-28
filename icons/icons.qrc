@@ -3,5 +3,6 @@
         <file>dna.png</file>
         <file>search.png</file>
         <file>app.png</file>
+        <file>squares.gif</file>
     </qresource>
 </RCC>
