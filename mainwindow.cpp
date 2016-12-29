@@ -179,6 +179,30 @@ void MainWindow::showAbout()
     dialog.exec();
 }
 
+void MainWindow::showRawHeader()
+{
+
+    // show a simple dialog of raw headers
+    QDialog * dialog = new QDialog;
+    QPlainTextEdit * mEdit = new QPlainTextEdit(dialog);
+    mEdit->setReadOnly(true);
+    QVBoxLayout * vLayout = new QVBoxLayout;
+    QDialogButtonBox * buttonBox = new QDialogButtonBox(QDialogButtonBox::Close);
+    vLayout->addWidget(mEdit);
+    vLayout->addWidget(buttonBox);
+    dialog->setLayout(vLayout);
+
+    QObject::connect(buttonBox,SIGNAL(rejected()), dialog,SLOT(reject()));
+    mEdit->setPlainText(mModel->header().raw());
+    dialog->resize(600,400);
+    dialog->setWindowTitle(tr("Raw header"));
+    dialog->exec();
+    delete dialog;
+
+
+
+}
+
 
 void MainWindow::setVariantCount(int count)
 {
@@ -225,6 +249,11 @@ void MainWindow::createMenuBar()
     QAction * sampleAction = viewMenu->addAction(tr("Show sample fields"),mSampleDock,SLOT(setVisible(bool)));
     sampleAction->setCheckable(true);
     sampleAction->setChecked(true);
+
+    viewMenu->addSeparator();
+    viewMenu->addAction(QIcon(),tr("View raw header"),this, SLOT(showRawHeader()));
+
+
 
     // Help menu
     QMenu * helpMenu = bar->addMenu(tr("&Help"));

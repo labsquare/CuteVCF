@@ -23,6 +23,7 @@ public Q_SLOTS:
     void focusRegionEdit();
     void exportCsv();
     void showAbout();
+    void showRawHeader();
 
 
 protected:
