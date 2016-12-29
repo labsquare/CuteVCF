@@ -21,6 +21,7 @@ MainWindow::MainWindow(QWidget *parent) :
     mView->setSelectionBehavior(QAbstractItemView::SelectRows);
     mView->verticalHeader()->hide();
     mView->horizontalHeader()->setHighlightSections(false);
+    mView->setContextMenuPolicy(Qt::CustomContextMenu);
 
     // set the searchbar properties
     mSearchEdit->setPlaceholderText(tr("Select a region... <chr> or <chr:start-end>"));
@@ -62,6 +63,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(mView->selectionModel(),SIGNAL(currentRowChanged(QModelIndex,QModelIndex)),mInfoWidget,SLOT(setLine(QModelIndex)));
     connect(mView->selectionModel(),SIGNAL(currentRowChanged(QModelIndex,QModelIndex)),mSampleWidget,SLOT(setLine(QModelIndex)));
     connect(mModel,SIGNAL(loadingChanged()),this,SLOT(loadingChanged()));
+    connect(mView, SIGNAL(customContextMenuRequested(QPoint)),this,SLOT(onVariantContextMenu(QPoint)));
 
     createMenuBar();
     statusBar()->addPermanentWidget(mVariantCount);
@@ -177,6 +179,7 @@ void MainWindow::showAbout()
     dialog.exec();
 }
 
+
 void MainWindow::setVariantCount(int count)
 {
     if (count == 0)
@@ -262,4 +265,40 @@ void MainWindow::loadingChanged()
     mInfoDock->setDisabled(enable);
     mSampleDock->setDisabled(enable);
     mSearchEdit->setDisabled(enable);
+}
+
+void MainWindow::onVariantContextMenu(const QPoint &pos)
+{
+    // show a context menu when right click on a variant
+
+    qDebug()<<"click";
+    QMenu variantMenu;
+
+    QAction * ucsc    = variantMenu.addAction(QIcon(":/ucsc.png"),tr("Open with UCSC"));
+    QAction * ensembl = variantMenu.addAction(QIcon(":/ensembl.png"),tr("Open with Ensembl"));
+
+
+    QModelIndex index =mView->indexAt(pos);
+    QAction * rep = nullptr;
+
+
+    if (index.isValid())
+        rep = variantMenu.exec(mView->mapToGlobal(pos));
+    else
+        return;
+
+    QString url;
+    if (rep == ucsc)
+        url = QString("http://genome.ucsc.edu/cgi-bin/hgTracks?org=%1&db=%2&position=%3").arg("human").arg("hg19").arg(mModel->line(index).location());
+
+
+    if (rep == ensembl)
+        url = QString("http:/www.ensembl.org/%1/Location/View?r=%2").arg("human").arg(mModel->line(index).location());
+
+
+    QDesktopServices::openUrl(QUrl(url));
+
+
+
+
 }

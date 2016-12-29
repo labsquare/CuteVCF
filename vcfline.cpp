@@ -12,7 +12,6 @@ VcfLine VcfLine::fromLine(const QByteArray &line)
     VcfLine out;
     QByteArrayList lines = line.split(QChar::Tabulation);
 
-    qDebug()<<Q_FUNC_INFO<<lines.count();
 
     if ( line.count() >= 9)
     {
@@ -175,6 +174,16 @@ void VcfLine::addRawSample(const QByteArray &sample)
 int VcfLine::sampleCount() const
 {
     return mSamples.count();
+}
+
+QString VcfLine::location() const
+{
+
+    QString c = mChromosom;
+    QString p = QString::number(mPosition);
+
+    return c+":"+p;
+
 }
 
 

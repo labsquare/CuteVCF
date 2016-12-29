@@ -33,6 +33,7 @@ protected:
 
 protected Q_SLOTS:
     void loadingChanged();
+    void onVariantContextMenu(const QPoint& pos);
 
 private:
     QTableView * mView;

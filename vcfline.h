@@ -43,6 +43,8 @@ public:
     void addRawSample(const QByteArray& rawSample);
     int sampleCount() const;
 
+    QString location() const;
+
 
 private:
     QByteArray mChromosom;
