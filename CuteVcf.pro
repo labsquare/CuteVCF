@@ -11,6 +11,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET =  CuteVcf
 TEMPLATE = app
 
+
 # On linux, compile htslib
 unix {
 mytarget.target = $$PWD/htslib/libhts.so

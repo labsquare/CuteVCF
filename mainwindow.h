@@ -40,6 +40,7 @@ private:
     QLineEdit * mSearchEdit;
     InfoWidget * mInfoWidget;
     SampleWidget * mSampleWidget;
+    QToolBar * mMainToolBar;
 
     QDockWidget * mInfoDock;
     QDockWidget * mSampleDock;

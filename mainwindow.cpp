@@ -19,32 +19,43 @@ MainWindow::MainWindow(QWidget *parent) :
     mView->horizontalHeader()->setStretchLastSection(true);
     mView->setAlternatingRowColors(true);
     mView->setSelectionBehavior(QAbstractItemView::SelectRows);
+    mView->verticalHeader()->hide();
+    mView->horizontalHeader()->setHighlightSections(false);
 
     // set the searchbar properties
-    mSearchEdit->setPlaceholderText(tr("Write the region to select in format <chr> or <chr:start-end>"));
+    mSearchEdit->setPlaceholderText(tr("Select a region... <chr> or <chr:start-end>"));
     mSearchEdit->setCompleter(new QCompleter);
     mSearchEdit->completer()->setCaseSensitivity(Qt::CaseInsensitive);
     mSearchEdit->addAction(QIcon::fromTheme("system-search"),QLineEdit::LeadingPosition);
 
     // mSearchEdit is inside a QtoolBar
-    QToolBar * mainToolBar = new QToolBar("main toolbar");
-    mainToolBar->setFloatable(false);
-    mainToolBar->setAllowedAreas(Qt::TopToolBarArea);
-    mainToolBar->setMovable(false);
-    addToolBar(Qt::TopToolBarArea, mainToolBar);
-    mainToolBar->addWidget(mSearchEdit);
+    mMainToolBar = new QToolBar("main toolbar");
+    mMainToolBar->setFloatable(false);
+    mMainToolBar->setAllowedAreas(Qt::TopToolBarArea);
+    mMainToolBar->setMovable(false);
+    addToolBar(Qt::TopToolBarArea, mMainToolBar);
+
+    QToolBar * searchToolBar = new QToolBar("search bar");
+    searchToolBar->setFloatable(false);
+    searchToolBar->setMovable(false);
+    searchToolBar->addWidget(mSearchEdit);
+    searchToolBar->addAction("search");
+
+    addToolBar(Qt::TopToolBarArea, searchToolBar);
+
+
 
 
     // Create info Dock
     mInfoDock = new QDockWidget(tr("Infos fields"));
     mInfoDock->setWidget(mInfoWidget);
-    mInfoDock->setFeatures(QDockWidget::DockWidgetMovable|QDockWidget::DockWidgetFloatable);
+    mInfoDock->setFeatures(QDockWidget::DockWidgetMovable);
     addDockWidget(Qt::RightDockWidgetArea, mInfoDock);
 
     // Create Sample Dock
     mSampleDock= new QDockWidget(tr("Sample fields"));
     mSampleDock->setWidget(mSampleWidget);
-    mSampleDock->setFeatures(QDockWidget::DockWidgetMovable|QDockWidget::DockWidgetFloatable);
+    mSampleDock->setFeatures(QDockWidget::DockWidgetMovable);
     addDockWidget(Qt::RightDockWidgetArea, mSampleDock);
 
     connect(mSearchEdit,SIGNAL(returnPressed()),this,SLOT(loadRegion()));
@@ -54,8 +65,21 @@ MainWindow::MainWindow(QWidget *parent) :
 
     createMenuBar();
     statusBar()->addPermanentWidget(mVariantCount);
+
+
     setCentralWidget(mView);
+
+
+
     resize(800,600);
+
+    setStyleSheet("QMainWindow::separator{margin:0px;padding:0px; width:3px}");
+    //   setStyleSheet("QDockWidget::title{margin:0px;}");
+    //   setStyleSheet("QTableView{margin:0px;}");
+    //   setStyleSheet("QDockWidget{margin:0px;}");
+
+    //   setStyleSheet("QTableView::item { border-left: 0px }");
+
 }
 
 MainWindow::~MainWindow()
@@ -176,9 +200,13 @@ void MainWindow::createMenuBar()
 
     // File menu
     QMenu * fileMenu = bar->addMenu(tr("&File"));
-    fileMenu->addAction(QIcon::fromTheme("document-open"), tr("Open of vcf file"),this,SLOT(openFile()),QKeySequence::Open);
-    fileMenu->addAction(QIcon::fromTheme("document-save-as"),tr("Export to CSV"),this,SLOT(exportCsv()),QKeySequence::Save);
+    QAction * openAction = fileMenu->addAction(QIcon::fromTheme("document-open"), tr("Open of vcf file"),this,SLOT(openFile()),QKeySequence::Open);
+    QAction * saveAction = fileMenu->addAction(QIcon::fromTheme("document-save-as"),tr("Export to CSV"),this,SLOT(exportCsv()),QKeySequence::Save);
     fileMenu->addAction(QIcon::fromTheme("application-exit"),tr("Close"),qApp, SLOT(closeAllWindows()), QKeySequence::Quit);
+
+    mMainToolBar->addAction(openAction);
+    mMainToolBar->addAction(saveAction);
+
 
     // Edit menu
     QMenu * editMenu = bar->addMenu(tr("&Edit"));
@@ -202,6 +230,13 @@ void MainWindow::createMenuBar()
 
 
     setMenuBar(bar);
+
+
+    QWidget * empty = new QWidget;
+    empty->setMinimumWidth(350);
+    empty->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
+    mMainToolBar->addWidget(empty);
+
 
 }
 

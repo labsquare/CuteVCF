@@ -12,9 +12,12 @@ InfoWidget::InfoWidget(VcfModel * vcfModel, QWidget *parent)
     mView->horizontalHeader()->hide();
     mView->setSelectionBehavior(QAbstractItemView::SelectRows);
     mView->setModel(mModel);
-    mView->verticalHeader()->hide();
+    mView->verticalHeader()->setVisible(false);
+
     mView->horizontalHeader()->setSectionResizeMode(1,QHeaderView::Stretch);
     mView->setAlternatingRowColors(true);
+    mView->horizontalHeader()->setHighlightSections(false);
+
     QVBoxLayout * cLayout = new QVBoxLayout;
     cLayout->addWidget(mView);
     cLayout->setContentsMargins(0,0,0,0);
@@ -24,7 +27,9 @@ InfoWidget::InfoWidget(VcfModel * vcfModel, QWidget *parent)
 
 void InfoWidget::setLine(const QModelIndex &index)
 {
-    mModel->clear();
+    // avoid cliping with clear... Will probably change this with custom model
+    int count = mModel->rowCount();
+    mModel->removeRows(0, count);
     mModel->setHorizontalHeaderLabels(QStringList()<<tr("Key")<<tr("Value"));
     mView->horizontalHeader()->show();
 
