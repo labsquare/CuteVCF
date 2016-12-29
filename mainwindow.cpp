@@ -101,8 +101,11 @@ void MainWindow::setFilename(const QString &filename)
     }
 
     // set model with filename and reset the view.
-    if (mModel->setFilename(filename))
+
+    if ( QFile::exists(filename))
     {
+        mModel->setFilename(filename);
+
         reset();
         if (!mModel->chromosoms().isEmpty()){
             mSearchEdit->completer()->setModel(new QStringListModel(mModel->chromosoms()));

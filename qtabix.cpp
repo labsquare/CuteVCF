@@ -12,28 +12,12 @@ QTabix::QTabix(const QString &filename)
 
 QTabix::~QTabix()
 {
-    if (tbx)
-        tbx_destroy(tbx);
+
 }
 
-bool QTabix::setRegion(const QString &region)
+void QTabix::setRegion(const QString &region)
 {
-    if (!tbx)
-        return false;
-
     mRegions = region;
-
-    if (iter)
-        tbx_itr_destroy(iter);
-
-    iter = tbx_itr_querys(tbx, region.toStdString().c_str());
-
-    if (!iter){
-        qCritical()<<"could not query the region "<<region;
-        return false;
-    }
-    return true;
-
 }
 
 const QString &QTabix::region() const
@@ -46,11 +30,85 @@ const QString &QTabix::filename() const
     return mFilename;
 }
 
-bool QTabix::setFilename(const QString &filename)
+void QTabix::setFilename(const QString &filename)
 {
     mFilename = filename;
-    fp  = NULL;
-    tbx = NULL;
+    if (QFile::exists(mFilename))
+        readInfo();
+}
+
+const QByteArray &QTabix::header() const
+{
+    return mHeaders;
+}
+
+const QStringList &QTabix::chromosoms() const
+{
+    return mChromosoms;
+}
+
+bool QTabix::readLineInto(QByteArray &line)
+{
+    if (tbx_itr_next(fp, tbx, iter,&str) >= 0)
+    {
+        line = QByteArray(str.s);
+        return true;
+    }
+
+
+    tbx_itr_destroy(iter);
+    tbx_destroy(tbx);
+
+    return false;
+
+}
+void QTabix::buildIndex(const QString &filename)
+{
+    // build vcf.gz.tbi
+    tbx_conf_t conf = tbx_conf_vcf;
+    int min_shift = 0;
+    tbx_index_build(filename.toStdString().c_str(), min_shift, &conf);
+}
+
+bool QTabix::open()
+{
+    fp   = NULL;
+    tbx  = NULL;
+    iter = NULL;
+    // open file
+
+    fp = hts_open(mFilename.toStdString().c_str(),"r");
+    if (!fp){
+        qCritical()<<Q_FUNC_INFO<<"Could not read "<<mFilename;
+        return false;
+    }
+    // open index
+    tbx = tbx_index_load(mFilename.toStdString().c_str());
+    if (!tbx){
+        qCritical()<<Q_FUNC_INFO<<"Could not read .tbi index of "<<mFilename;
+        return false;
+    }
+
+    tbx->conf = tbx_conf_vcf;
+    str= {0,0,0};
+
+    // set region
+    iter = tbx_itr_querys(tbx, mRegions.toStdString().c_str());
+
+    if (!iter){
+        qCritical()<<"could not query the region "<<mRegions;
+        return false;
+    }
+    return true;
+}
+
+
+bool QTabix::readInfo()
+{
+
+    fp   = NULL;
+    tbx  = NULL;
+    iter = NULL;
     // open file
     fp = hts_open(mFilename.toStdString().c_str(),"r");
     if (!fp){
@@ -73,85 +131,25 @@ bool QTabix::setFilename(const QString &filename)
         mChromosoms.append(seq[i]);
     delete seq;
 
+
     // reads headers
     str= {0,0,0};
     while ( hts_getline(fp, KS_SEP_LINE, &str) >= 0 )
     {
-        if ( !str.l || str.s[0]!=tbx->conf.meta_char ) break;
-        mHeaders = str.s;
+        if ( !str.l || str.s[0]!=tbx->conf.meta_char ) {
+            break;
+        }
+        else {
+            mHeaders.append(str.s);
+            mHeaders.append('\n');
+        }
+
     }
 
-    tbx->conf = tbx_conf_vcf;
-    str= {0,0,0};
-
-    return true;
-
+    tbx_itr_destroy(iter);
+    tbx_destroy(tbx);
 
 }
 
-const QByteArray &QTabix::header() const
-{
-    return mHeaders;
-}
-
-const QStringList &QTabix::chromosoms() const
-{
-    return mChromosoms;
-}
-
-bool QTabix::readLineInto(QByteArray &line)
-{
-    if (tbx_itr_next(fp, tbx, iter,&str) >= 0)
-    {
-        line = QByteArray(str.s);
-        return true;
-    }
-
-    return false;
-
-    //    hts_close(fp);
-
-    //    line.clear();
-    //    kstring_t str;
-    //    str.l = 0;
-    //    str.m = 0;
-    //    str.s = NULL;
-
-    //    auto current_chrom  = mChromosoms.begin();
-
-    //    if (has_jumped) {
-    //        if (iter && tbx_itr_next(fp, tbx, iter, &str) >= 0) {
-    //            line = QByteArray(str.s);
-    //            return true;
-    //        } else return false;
-    //    } else { // step through all sequences in the file
-    //        // we've never jumped, so read everything
-    //        if (iter && tbx_itr_next(fp, tbx, iter, &str) >= 0) {
-    //            line = QByteArray(str.s);
-    //            return true;
-    //        } else {
-    //            ++current_chrom;
-    //            while (current_chrom != mChromosoms.end()) {
-    //                tbx_itr_destroy(iter);
-    //                iter = tbx_itr_querys(tbx, current_chrom->toStdString().c_str());
-    //                if (iter && tbx_itr_next(fp, tbx, iter, &str) >= 0) {
-    //                    line = QByteArray(str.s);
-    //                    return true;
-    //                } else {
-    //                    ++current_chrom;
-    //                }
-    //            }
-    //            return false;
-    //        }
-    //    }
-    //    return false;
-}
-
-void QTabix::buildIndex(const QString &filename)
-{
-    tbx_conf_t conf = tbx_conf_vcf;
-    int min_shift = 0;
-    tbx_index_build(filename.toStdString().c_str(), min_shift, &conf);
-}
 
 

@@ -13,12 +13,12 @@ public:
     explicit QTabix(const QString& filename);
     ~QTabix();
 
-    bool setRegion(const QString& region);
+    void setRegion(const QString& region);
     const QString& region() const;
 
 
     const QString& filename() const;
-    bool setFilename(const QString &filename);
+    void setFilename(const QString &filename);
 
     const QByteArray& header() const;
     const QStringList& chromosoms() const;
@@ -27,20 +27,22 @@ public:
 
     static void buildIndex(const QString& filename);
 
+    bool open();
+
+
+
 
 protected:
-    void readHeader();
+    bool readInfo();
 
 private:
     QString mFilename;
     QStringList mChromosoms;
     QByteArray mHeaders;
     QString mRegions;
-    htsFile* fp = NULL;
-    tbx_t* tbx  = NULL;
-    hts_itr_t* iter =NULL;
-    bool has_jumped;
-    const tbx_conf_t *idxconf;
+    htsFile* fp     = NULL;
+    tbx_t* tbx      = NULL;
+    hts_itr_t* iter = NULL;
     kstring_t str;
 
 

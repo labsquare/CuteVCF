@@ -22,7 +22,7 @@ public:
 
     void setRegion(const QString& region);
     QString filename() const;
-    bool setFilename(const QString &filename);
+    void setFilename(const QString &filename);
     const VcfLine& line(const QModelIndex& index);
 
     const VcfHeader& header() const;

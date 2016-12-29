@@ -12,22 +12,25 @@ VcfLine VcfLine::fromLine(const QByteArray &line)
     VcfLine out;
     QByteArrayList lines = line.split(QChar::Tabulation);
 
+    qDebug()<<Q_FUNC_INFO<<lines.count();
 
+    if ( line.count() >= 9)
+    {
 
-    out.setChromosom(lines.at(0));
-    out.setPosition(lines.at(1).toUInt());
-    out.setId(lines.at(2));
-    out.setRef(lines.at(3));
-    out.setAlt(lines.at(4));
-    out.setQual(lines.at(5).toInt());
-    out.setFilter(lines.at(6));
-    out.setRawInfos(lines.at(7));
+        out.setChromosom(lines.at(0));
+        out.setPosition(lines.at(1).toUInt());
+        out.setId(lines.at(2));
+        out.setRef(lines.at(3));
+        out.setAlt(lines.at(4));
+        out.setQual(lines.at(5).toInt());
+        out.setFilter(lines.at(6));
+        out.setRawInfos(lines.at(7));
+        out.setRawFormat(lines.value(8));
 
-//    out.setRawFormat(lines.value(8));
+        for (int i=9; i<lines.count(); ++i)
+            out.addRawSample(lines.at(i));
 
-    for (int i=9; i<lines.count(); ++i)
-        out.addRawSample(lines.at(i));
-
+    }
 
     return out;
 }
@@ -140,7 +143,7 @@ void VcfLine::setRawInfos(const QByteArray &infos)
     mInfos = infos;
 }
 
- QByteArray VcfLine::rawSample(int i) const
+QByteArray VcfLine::rawSample(int i) const
 {
     return mSamples.value(i,QByteArray());
 }

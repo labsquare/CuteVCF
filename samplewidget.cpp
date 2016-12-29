@@ -48,6 +48,8 @@ void SampleWidget::setSample(int id)
     mView->horizontalHeader()->show();
     mModel->setHorizontalHeaderLabels(QStringList()<<tr("Key")<<tr("Value"));
 
+    qDebug()<<mCurrentLine.sample(0);
+
     QHash<QByteArray, QVariant> samples  = mCurrentLine.sample(id);
     for (QByteArray key : samples.keys()){
 
