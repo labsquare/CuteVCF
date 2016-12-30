@@ -31,11 +31,14 @@ protected:
     void createMenuBar();
     void setVariantCount(int count);
     void reset();
+    void addRecent(const QString& filename);
+    QStringList loadRecent();
 
 
 protected Q_SLOTS:
     void loadingChanged();
     void onVariantContextMenu(const QPoint& pos);
+    void recentClicked();
 
 private:
     QTableView * mView;

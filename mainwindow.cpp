@@ -40,7 +40,6 @@ MainWindow::MainWindow(QWidget *parent) :
     searchToolBar->setFloatable(false);
     searchToolBar->setMovable(false);
     searchToolBar->addWidget(mSearchEdit);
-    searchToolBar->addAction("search");
 
     addToolBar(Qt::TopToolBarArea, searchToolBar);
 
@@ -131,6 +130,7 @@ void MainWindow::setFilename(const QString &filename)
     if ( QFile::exists(filename))
     {
         mModel->setFilename(filename);
+        addRecent(filename);
 
         reset();
         if (!mModel->chromosoms().isEmpty()){
@@ -253,6 +253,55 @@ void MainWindow::reset()
     mSearchEdit->clear();
 }
 
+void MainWindow::addRecent(const QString &filename)
+{
+    QSettings settings;
+    QStringList paths = loadRecent();
+
+    // Don't save if it already exists
+    if (paths.contains(filename))
+        return;
+
+    paths.append(filename);
+
+    // 30 maximum file in recent menu
+    if (paths.size() > 30)
+        paths.removeFirst();
+
+    settings.beginWriteArray("recent");
+    int i = 0;
+
+    for (QString path : paths)
+    {
+        settings.setArrayIndex(i);
+        settings.setValue("path", path);
+        ++i;
+    }
+
+    settings.endArray();
+
+
+
+}
+
+QStringList MainWindow::loadRecent()
+{
+    QSettings settings;
+    QStringList paths;
+    int size = settings.beginReadArray("recent");
+
+    for (int i = 0; i < size; ++i) {
+        settings.setArrayIndex(i);
+        QString filename = settings.value("path").toString();
+        if (QFile::exists(filename))
+            paths.append(filename);
+    }
+    settings.endArray();
+
+    return paths;
+
+
+}
 
 void MainWindow::createMenuBar()
 {
@@ -261,6 +310,14 @@ void MainWindow::createMenuBar()
     // File menu
     QMenu * fileMenu = bar->addMenu(tr("&File"));
     QAction * openAction = fileMenu->addAction(QIcon::fromTheme("document-open"), tr("Open of vcf file"),this,SLOT(openFile()),QKeySequence::Open);
+
+    QMenu * recentFile = new QMenu(tr("Recent files"));
+    for (QString recent : loadRecent())
+        recentFile->addAction(recent,this,SLOT(recentClicked()));
+
+    fileMenu->addMenu(recentFile);
+
+
     QAction * saveAction = fileMenu->addAction(QIcon::fromTheme("document-save-as"),tr("Export to CSV"),this,SLOT(exportCsv()),QKeySequence::Save);
     fileMenu->addAction(QIcon::fromTheme("application-exit"),tr("Close"),qApp, SLOT(closeAllWindows()), QKeySequence::Quit);
 
@@ -360,6 +417,16 @@ void MainWindow::onVariantContextMenu(const QPoint &pos)
 
 
     QDesktopServices::openUrl(QUrl(url));
+
+}
+
+void MainWindow::recentClicked()
+{
+    QAction * action = qobject_cast<QAction*>(sender());
+
+    if (action)
+        setFilename(action->text());
+
 
 
 
