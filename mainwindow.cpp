@@ -203,6 +203,39 @@ void MainWindow::showRawHeader()
 
 }
 
+void MainWindow::showInfo()
+{
+    // show a simple dialog of raw headers
+    QDialog * dialog = new QDialog;
+    QVBoxLayout * dLayout  = new QVBoxLayout(dialog);
+    QTabWidget * tabWidget = new QTabWidget(dialog);
+    dLayout->addWidget(tabWidget);
+    dialog->setLayout(dLayout);
+
+    QTreeWidget * tagsView = new QTreeWidget(dialog);
+    tagsView->setColumnCount(2);
+    tagsView->setHeaderLabels(QStringList()<<"Key"<<"Value");
+    for (QString key : mModel->header().tags().keys())
+    {
+        QTreeWidgetItem * item = new QTreeWidgetItem;
+        item->setText(0, key);
+        item->setText(1, mModel->header().tags().value(key).toString());
+        tagsView->addTopLevelItem(item);
+    }
+
+
+    tagsView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    tabWidget->addTab(tagsView, tr("Tags"));
+
+    dialog->resize(500,700);
+    dialog->exec();
+
+
+
+    delete dialog;
+
+}
+
 
 void MainWindow::setVariantCount(int count)
 {
@@ -251,7 +284,8 @@ void MainWindow::createMenuBar()
     sampleAction->setChecked(true);
 
     viewMenu->addSeparator();
-    viewMenu->addAction(QIcon(),tr("View raw header"),this, SLOT(showRawHeader()));
+    viewMenu->addAction(QIcon(),tr("Show raw header"),this, SLOT(showRawHeader()));
+    viewMenu->addAction(QIcon(),tr("Show info"),this, SLOT(showInfo()));
 
 
 

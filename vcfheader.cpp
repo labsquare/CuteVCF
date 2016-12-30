@@ -18,6 +18,7 @@ void VcfHeader::setRaw(const QByteArray &raw)
     mInfos.clear();
     mFormats.clear();
     mColnames.clear();
+    mTags.clear();
 
 
     QByteArrayList lines = mRaw.split('\n');
@@ -25,11 +26,21 @@ void VcfHeader::setRaw(const QByteArray &raw)
     for (QByteArray b_line : lines)
     {
         QString line(b_line);
+
+        if (line.contains(QRegularExpression("^##[a-zA-Z0-9]+=[^<]"))){
+
+            QStringList lines = line.split("=");
+            QString key       = lines.at(0);
+            QString value     = lines.at(1);
+            mTags.insert(key.replace("##",""), value);
+
+        }
+
+
         if (line.startsWith("##INFO")){
             QHash<QString, QVariant> info = captureParams(line);
             QString id = info.value("ID","unknown").toString();
             mInfos[id] = info;
-
         }
 
         if (line.startsWith("##FORMAT")){
@@ -58,6 +69,11 @@ QHash<QString, QVariant> VcfHeader::info(const QString &key) const
 QHash<QString, QVariant> VcfHeader::format(const QString &key) const
 {
     return mFormats.value(key);
+}
+
+const QHash<QString, QVariant> &VcfHeader::tags() const
+{
+    return mTags;
 }
 
 const QStringList &VcfHeader::colnames() const

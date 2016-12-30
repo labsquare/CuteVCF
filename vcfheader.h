@@ -13,6 +13,7 @@ public:
 
     QHash<QString, QVariant> info(const QString& key) const;
     QHash<QString, QVariant> format(const QString& key) const;
+    const QHash<QString, QVariant>& tags() const;
     const QStringList& colnames() const;
 
 
@@ -24,6 +25,8 @@ private:
     QByteArray mRaw;
     QHash<QString, QHash<QString, QVariant>> mInfos;
     QHash<QString, QHash<QString, QVariant>> mFormats;
+    QHash<QString, QVariant> mTags;
+
     QStringList mColnames;
 };
 

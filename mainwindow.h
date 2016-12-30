@@ -24,6 +24,7 @@ public Q_SLOTS:
     void exportCsv();
     void showAbout();
     void showRawHeader();
+    void showInfo();
 
 
 protected:
