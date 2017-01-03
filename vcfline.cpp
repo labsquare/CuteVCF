@@ -1,27 +1,53 @@
+/*
+This file is part of CuteVCF.
+
+Foobar is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Foobar is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+
+@author : Sacha Schutz <sacha@labsquare.org>
+*/
 #include "vcfline.h"
 
 VcfLine::VcfLine()
 {
-
+    mChromosom="chr3";
+    mPosition = 10;
 }
 
 VcfLine VcfLine::fromLine(const QByteArray &line)
 {
+
     VcfLine out;
     QByteArrayList lines = line.split(QChar::Tabulation);
-    out.setChromosom(lines.at(0));
-    out.setPosition(lines.at(1).toUInt());
-    out.setId(lines.at(2));
-    out.setRef(lines.at(3));
-    out.setAlt(lines.at(4));
-    out.setQual(lines.at(5).toInt());
-    out.setFilter(lines.at(6));
-    out.setRawInfos(lines.at(7));
-    out.setRawFormat(lines.at(8));
 
-    for (int i=9; i<lines.count(); ++i)
-        out.addRawSample(lines.at(i));
 
+    if ( line.count() >= 9)
+    {
+
+        out.setChromosom(lines.at(0));
+        out.setPosition(lines.at(1).toUInt());
+        out.setId(lines.at(2));
+        out.setRef(lines.at(3));
+        out.setAlt(lines.at(4));
+        out.setQual(lines.at(5).toInt());
+        out.setFilter(lines.at(6));
+        out.setRawInfos(lines.at(7));
+        out.setRawFormat(lines.value(8));
+
+        for (int i=9; i<lines.count(); ++i)
+            out.addRawSample(lines.at(i));
+
+    }
 
     return out;
 }
@@ -134,7 +160,7 @@ void VcfLine::setRawInfos(const QByteArray &infos)
     mInfos = infos;
 }
 
- QByteArray VcfLine::rawSample(int i) const
+QByteArray VcfLine::rawSample(int i) const
 {
     return mSamples.value(i,QByteArray());
 }
@@ -166,6 +192,16 @@ void VcfLine::addRawSample(const QByteArray &sample)
 int VcfLine::sampleCount() const
 {
     return mSamples.count();
+}
+
+QString VcfLine::location() const
+{
+
+    QString c = mChromosom;
+    QString p = QString::number(mPosition);
+
+    return c+":"+p;
+
 }
 
 

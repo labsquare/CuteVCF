@@ -1,0 +1,4 @@
+## (0.1.0)
+
+- Reading vcf.gz with htslib 
+- compile on windows, mac and linux 

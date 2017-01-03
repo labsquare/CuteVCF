@@ -1,3 +1,21 @@
+/*
+This file is part of CuteVCF.
+
+Foobar is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Foobar is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+
+@author : Sacha Schutz <sacha@labsquare.org>
+*/
 #include "vcfmodel.h"
 
 VcfModel::VcfModel(QObject * parent):
@@ -9,17 +27,19 @@ VcfModel::VcfModel(QObject * parent):
     mBaseColors['G'] = QColor("#4E4E56");
     mBaseColors['T'] = QColor("#ed6d79");
 
+    connect(&mFutureWatcher, SIGNAL(finished()), this,SLOT(loaded()));
 
 }
 
 int VcfModel::rowCount(const QModelIndex &parent) const
 {
+    Q_UNUSED(parent)
     return mLines.count();
 }
 
 int VcfModel::columnCount(const QModelIndex &parent) const
 {
-
+    Q_UNUSED(parent)
     return 7;
 }
 
@@ -29,7 +49,6 @@ QVariant VcfModel::data(const QModelIndex &index, int role) const
         return QVariant();
 
     VcfLine line = mLines.at(index.row());
-
 
     if ( role == Qt::DisplayRole)
     {
@@ -47,37 +66,6 @@ QVariant VcfModel::data(const QModelIndex &index, int role) const
         }
 
     }
-
-    if ( role == Qt::TextColorRole)
-    {
-        if (index.column() == 3) {
-            if (line.ref().size() == 1)
-                return mBaseColors.value(line.ref().at(0));
-        }
-
-        if (index.column() == 4) {
-            if (line.alt().size() == 1)
-                return mBaseColors.value(line.alt().at(0));
-        }
-    }
-
-    if (role == Qt::FontRole && (index.column() == 3 || index.column()==4))
-    {
-        QFont font;
-        font.setBold(true);
-        return font;
-    }
-
-
-
-
-
-    if (role == Qt::DecorationRole)
-    {
-        if (index.column() == 0)
-            return QIcon(":/dna.png");
-    }
-
     return QVariant();
 }
 
@@ -106,20 +94,27 @@ QVariant VcfModel::headerData(int section, Qt::Orientation orientation, int role
 
 void VcfModel::load()
 {
+    // this methods is called async by setRegion
     setLoading(true);
-    beginResetModel();
-    mLines.clear();
-
-    mTabixFile.setRegion(mRegion);
+    mTampons.clear();
 
     QByteArray line;
-    while (mTabixFile.readLineInto(line))
+    mRealCount = 0;
+
+    if (mTabixFile.open())
     {
-        VcfLine item = VcfLine::fromLine(line);
-        mLines.append(item);
+        while (mTabixFile.readLineInto(line))
+        {
+//            if (mRealCount < MAX_ITEMS)
+//            {
+                VcfLine item = VcfLine::fromLine(line) ;
+                mTampons.append(item);
+//            }
+            mRealCount++;
+        }
     }
 
-    endResetModel();
+
     setLoading(false);
 
 }
@@ -133,32 +128,25 @@ void VcfModel::setLoading(bool enable)
 
 void VcfModel::setRegion(const QString &region)
 {
+    // launch async data load
     mFuture.cancel();
     mFuture.waitForFinished();
-
-    mRegion = region;
+    mTabixFile.setRegion(region);
     mFuture = QtConcurrent::run(this, &VcfModel::load);
     mFutureWatcher.setFuture(mFuture);
-
-
 }
 
 QString VcfModel::filename() const
 {
-
     return mFilename;
 }
 
-bool VcfModel::setFilename(const QString &filename)
+void VcfModel::setFilename(const QString &filename)
 {
     mFilename = filename;
     mLines.clear();
-    bool success = mTabixFile.setFilename(filename);
-
-    if (success)
-        mHeader.setRaw(mTabixFile.header());
-
-    return success;
+    mTabixFile.setFilename(filename);
+    mHeader.setRaw(mTabixFile.header());
 
 }
 
@@ -204,6 +192,11 @@ int VcfModel::count() const
     return mLines.count();
 }
 
+quint64 VcfModel::realCount() const
+{
+    return mRealCount;
+}
+
 void VcfModel::clear()
 {
     mLines.clear();
@@ -217,6 +210,12 @@ bool VcfModel::isLoading() const
 
 void VcfModel::loaded()
 {
+    // this methods is called when async load has been done
+    beginResetModel();
+
+    mLines.swap(mTampons);
+
+    endResetModel();
 
 }
 

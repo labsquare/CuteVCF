@@ -8,49 +8,62 @@ QT       += core gui concurrent
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
+TARGET =  CuteVCF
+TEMPLATE = app
 
+CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT
+
+# On linux, compile htslib
+unix {
 mytarget.target = $$PWD/htslib/libhts.so
 mytarget.commands = cd $$PWD/htslib; make -j4
 mytarget_clean.commands = cd $$PWD/htslib; make clean
-
 QMAKE_EXTRA_TARGETS += mytarget
 PRE_TARGETDEPS += $$PWD/htslib/libhts.so
 INCLUDEPATH+=$$PWD/htslib
 LIBS += -L$$PWD/htslib -lhts
 
-TARGET =  CuteVcf
-TEMPLATE = app
+
+}
+
+# On windows use libhts.a made from msys2.
+win32{
+LIBS += -L$$PWD/win32 -lhts
+
+INCLUDEPATH += $$PWD/htslib
+DEPENDPATH += $$PWD/htslib
+
+RC_ICONS =app.ico
+}
+
+
+include("QFontIcon/QFontIcon.pri")
 
 
 
 
 
+RESOURCES += files.qrc
 
-SOURCES += main.cpp\
-        mainwindow.cpp \
-    qtabix.cpp \
-    vcfmodel.cpp \
-    vcfline.cpp \
-    infowidget.cpp \
-    samplewidget.cpp \
-    vcfheader.cpp \
-    aboutdialog.cpp \
-    createindexdialog.cpp
-
-HEADERS  += mainwindow.h \
-    qtabix.h \
-    vcfmodel.h \
-    vcfline.h \
+HEADERS += \
+    aboutdialog.h \
+    createindexdialog.h \
     infowidget.h \
+    mainwindow.h \
+    qtabix.h \
     samplewidget.h \
     vcfheader.h \
-    aboutdialog.h \
-    createindexdialog.h
+    vcfline.h \
+    vcfmodel.h
 
-RESOURCES += \
-    icons/icons.qrc
-
-DISTFILES += \
-    icons/squares.gif
-
-
+SOURCES += \
+    aboutdialog.cpp \
+    createindexdialog.cpp \
+    infowidget.cpp \
+    mainwindow.cpp \
+    main.cpp \
+    qtabix.cpp \
+    samplewidget.cpp \
+    vcfheader.cpp \
+    vcfline.cpp \
+    vcfmodel.cpp

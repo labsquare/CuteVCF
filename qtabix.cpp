@@ -1,3 +1,21 @@
+/*
+This file is part of CuteVCF.
+
+Foobar is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Foobar is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+
+@author : Sacha Schutz <sacha@labsquare.org>
+*/
 #include "qtabix.h"
 
 QTabix::QTabix()
@@ -10,17 +28,14 @@ QTabix::QTabix(const QString &filename)
     setFilename(filename);
 }
 
-bool QTabix::setRegion(const QString &region)
+QTabix::~QTabix()
 {
-    if (!tbx)
-        return false;
 
+}
+
+void QTabix::setRegion(const QString &region)
+{
     mRegions = region;
-    tbx_itr_destroy(iter);
-    iter = tbx_itr_querys(tbx, region.toStdString().c_str());
-    has_jumped = true;
-    return true;
-
 }
 
 const QString &QTabix::region() const
@@ -33,42 +48,11 @@ const QString &QTabix::filename() const
     return mFilename;
 }
 
-bool QTabix::setFilename(const QString &filename)
+void QTabix::setFilename(const QString &filename)
 {
-    mFilename  = filename;
-    mChromosoms.clear();
-    mHeaders.clear();
-    has_jumped = false;
-    // Open file
-    fn = hts_open(mFilename.toStdString().c_str(),"r");
-    if (fn == NULL){
-        qCritical()<<Q_FUNC_INFO<<"cannot open file "<<filename;
-        return false;
-    }
-
-    // Open index
-    tbx = tbx_index_load(mFilename.toStdString().c_str());
-
-    if (tbx == NULL) {
-        qCritical()<<Q_FUNC_INFO<<"cannot open file "<<filename;
-        return false;
-    }
-
-    int nseq;
-    const char** seq = tbx_seqnames(tbx, &nseq);
-    for (int i=0; i<nseq; i++) {
-        mChromosoms.append(seq[i]);
-    }
-
-    delete seq;
-    idxconf = &tbx_conf_vcf;
-
-    //seek 0
-    iter = tbx_itr_querys(tbx, mChromosoms.first().toStdString().c_str());
-
-    readHeader();
-    return true;
-
+    mFilename = filename;
+    if (QFile::exists(mFilename))
+        readInfo();
 }
 
 const QByteArray &QTabix::header() const
@@ -83,72 +67,108 @@ const QStringList &QTabix::chromosoms() const
 
 bool QTabix::readLineInto(QByteArray &line)
 {
-    line.clear();
-    kstring_t str;
-    str.l = 0;
-    str.m = 0;
-    str.s = NULL;
-
-    auto current_chrom  = mChromosoms.begin();
-
-    if (has_jumped) {
-        if (iter && tbx_itr_next(fn, tbx, iter, &str) >= 0) {
-            line = QByteArray(str.s);
-            return true;
-        } else return false;
-    } else { // step through all sequences in the file
-        // we've never jumped, so read everything
-        if (iter && tbx_itr_next(fn, tbx, iter, &str) >= 0) {
-            line = QByteArray(str.s);
-            return true;
-        } else {
-            ++current_chrom;
-            while (current_chrom != mChromosoms.end()) {
-                tbx_itr_destroy(iter);
-                iter = tbx_itr_querys(tbx, current_chrom->toStdString().c_str());
-                if (iter && tbx_itr_next(fn, tbx, iter, &str) >= 0) {
-                    line = QByteArray(str.s);
-                    return true;
-                } else {
-                    ++current_chrom;
-                }
-            }
-            return false;
-        }
+    if (tbx_itr_next(fp, tbx, iter,&str) >= 0)
+    {
+        line = QByteArray(str.s);
+        return true;
     }
-    return false;
-}
 
+
+    tbx_itr_destroy(iter);
+    tbx_destroy(tbx);
+
+    return false;
+
+}
 void QTabix::buildIndex(const QString &filename)
 {
+    // build vcf.gz.tbi
     tbx_conf_t conf = tbx_conf_vcf;
     int min_shift = 0;
     tbx_index_build(filename.toStdString().c_str(), min_shift, &conf);
 }
 
-void QTabix::readHeader()
+bool QTabix::open()
 {
-    mHeaders.clear();
+    fp   = NULL;
+    tbx  = NULL;
+    iter = NULL;
+    // open file
 
-    if ( fn == nullptr || tbx == nullptr)
-        qWarning()<<"No file loaded";
+    fp = hts_open(mFilename.toStdString().c_str(),"r");
+    if (!fp){
+        qCritical()<<Q_FUNC_INFO<<"Could not read "<<mFilename;
+        return false;
+    }
+    // open index
+    tbx = tbx_index_load(mFilename.toStdString().c_str());
+    if (!tbx){
+        qCritical()<<Q_FUNC_INFO<<"Could not read .tbi index of "<<mFilename;
+        return false;
+    }
 
-    tbx_itr_querys(tbx, mChromosoms.first().toStdString().c_str());
+    tbx->conf = tbx_conf_vcf;
+    str= {0,0,0};
 
-    kstring_t str;
-    str.l = 0;
-    str.m = 0;
-    str.s = NULL;
+    // set region
+    iter = tbx_itr_querys(tbx, mRegions.toStdString().c_str());
 
-    while ( hts_getline(fn, KS_SEP_LINE, &str) >= 0 ) {
+    if (!iter){
+        qCritical()<<"could not query the region "<<mRegions;
+        return false;
+    }
+    return true;
+}
 
+
+bool QTabix::readInfo()
+{
+
+    fp   = NULL;
+    tbx  = NULL;
+    iter = NULL;
+    // open file
+    fp = hts_open(mFilename.toStdString().c_str(),"r");
+    if (!fp){
+        qCritical()<<Q_FUNC_INFO<<"Could not read "<<mFilename;
+        return false;
+    }
+    // open index
+    tbx = tbx_index_load(mFilename.toStdString().c_str());
+    if (!tbx){
+        qCritical()<<Q_FUNC_INFO<<"Could not read .tbi index of "<<mFilename;
+        return false;
+    }
+
+    // reads chromosomes
+    int nseq;
+    const char **seq = NULL;
+    seq = tbx_seqnames(tbx, &nseq);
+    mChromosoms.clear();
+    for (int i=0; i<nseq; ++i)
+        mChromosoms.append(seq[i]);
+    delete seq;
+
+
+    // reads headers
+    str= {0,0,0};
+    while ( hts_getline(fp, KS_SEP_LINE, &str) >= 0 )
+    {
         if ( !str.l || str.s[0]!=tbx->conf.meta_char ) {
             break;
-        } else {
+        }
+        else {
             mHeaders.append(str.s);
             mHeaders.append('\n');
         }
+
     }
 
-    iter = tbx_itr_querys(tbx, mChromosoms.first().toStdString().c_str());
+    tbx_itr_destroy(iter);
+    tbx_destroy(tbx);
+
+    return true;
 }
+
+
+

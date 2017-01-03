@@ -1,0 +1,4 @@
+CuteVCF is a genomics variant viewer according to the VCF specification. <https://samtools.github.io/hts-specs/VCFv4.2.pdf>. You can open vcf.gz file and read all information related to a variant.
+GUI is made with Qt 5.7 and vcf are reading with htslib.  
+CuteVCF is under GPL3 license. You can download the code source from github <http://github.com/labsquare/CuteVCF>.
+
