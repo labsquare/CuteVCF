@@ -58,6 +58,7 @@ protected Q_SLOTS:
     void loadingChanged();
     void onVariantContextMenu(const QPoint& pos);
     void recentClicked();
+    void chromboxChanged();
 
 private:
     QTableView * mView;
@@ -71,6 +72,7 @@ private:
     QDockWidget * mSampleDock;
     QLabel * mVariantCount;
     QMovie * mLoadingAnimation;
+    QComboBox * mChromBox;
 
 
 

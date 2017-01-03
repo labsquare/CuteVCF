@@ -28,6 +28,7 @@ MainWindow::MainWindow(QWidget *parent) :
     mSampleWidget = new SampleWidget(mModel);
     mVariantCount = new QLabel(this);
     mLoadingAnimation = new QMovie(":/squares.gif");
+    mChromBox     = new QComboBox;
 
 
     setWindowIcon(QIcon(":/app.png"));
@@ -59,10 +60,10 @@ MainWindow::MainWindow(QWidget *parent) :
     QToolBar * searchToolBar = new QToolBar("search bar");
     searchToolBar->setFloatable(false);
     searchToolBar->setMovable(false);
+    searchToolBar->addWidget(mChromBox);
     searchToolBar->addWidget(mSearchEdit);
 
     addToolBar(Qt::TopToolBarArea, searchToolBar);
-
 
 
 
@@ -83,6 +84,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(mView->selectionModel(),SIGNAL(currentRowChanged(QModelIndex,QModelIndex)),mSampleWidget,SLOT(setLine(QModelIndex)));
     connect(mModel,SIGNAL(loadingChanged()),this,SLOT(loadingChanged()));
     connect(mView, SIGNAL(customContextMenuRequested(QPoint)),this,SLOT(onVariantContextMenu(QPoint)));
+    connect(mChromBox,SIGNAL(currentIndexChanged(int)),this,SLOT(chromboxChanged()));
 
     createMenuBar();
     statusBar()->addPermanentWidget(mVariantCount);
@@ -155,9 +157,10 @@ void MainWindow::setFilename(const QString &filename)
         reset();
         if (!mModel->chromosoms().isEmpty()){
             mSearchEdit->completer()->setModel(new QStringListModel(mModel->chromosoms()));
+            mChromBox->setModel(new QStringListModel(mModel->chromosoms()));
 
             // by defaut, set to the chromosom 1
-            mSearchEdit->setText(mModel->chromosoms().last());
+//            mSearchEdit->setText(mModel->chromosoms().last());
 
             loadRegion();
 
@@ -456,8 +459,13 @@ void MainWindow::recentClicked()
     if (action)
         setFilename(action->text());
 
+}
 
+void MainWindow::chromboxChanged()
+{
 
-
+    qDebug()<<"salut";
+    mSearchEdit->setText(mChromBox->currentText());
+    loadRegion();
 
 }
