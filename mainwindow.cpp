@@ -1,3 +1,21 @@
+/*
+This file is part of CuteVCF.
+
+Foobar is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Foobar is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+
+@author : Sacha Schutz <sacha@labsquare.org>
+*/
 #include "mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -398,6 +416,7 @@ void MainWindow::onVariantContextMenu(const QPoint &pos)
 
     QAction * ucsc    = variantMenu.addAction(QIcon(":/ucsc.png"),tr("Open with UCSC"));
     QAction * ensembl = variantMenu.addAction(QIcon(":/ensembl.png"),tr("Open with Ensembl"));
+    QAction * copyLoc = variantMenu.addAction(tr("Copy location"));
 
 
     QModelIndex index =mView->indexAt(pos);
@@ -409,6 +428,13 @@ void MainWindow::onVariantContextMenu(const QPoint &pos)
     else
         return;
 
+    if (rep == copyLoc)
+    {
+        QApplication::clipboard()->setText(mModel->line(index).location());
+        return;
+    }
+
+
     QString url;
     if (rep == ucsc)
         url = QString("http://genome.ucsc.edu/cgi-bin/hgTracks?org=%1&db=%2&position=%3").arg("human").arg("hg19").arg(mModel->line(index).location());
@@ -416,6 +442,7 @@ void MainWindow::onVariantContextMenu(const QPoint &pos)
 
     if (rep == ensembl)
         url = QString("http:/www.ensembl.org/%1/Location/View?r=%2").arg("human").arg(mModel->line(index).location());
+
 
 
     QDesktopServices::openUrl(QUrl(url));
