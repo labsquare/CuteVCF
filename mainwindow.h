@@ -73,6 +73,7 @@ private:
     QDockWidget * mInfoDock;
     QDockWidget * mSampleDock;
     QLabel * mVariantCount;
+    QLabel * mLoadingLabel;
     QMovie * mLoadingAnimation;
     QComboBox * mChromBox;
 

@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
 
     win.show();
 
-    app.exec();
+    return app.exec();
 
 
 

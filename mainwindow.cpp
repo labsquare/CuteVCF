@@ -27,7 +27,8 @@ MainWindow::MainWindow(QWidget *parent) :
     mInfoWidget   = new InfoWidget(mModel);
     mSampleWidget = new SampleWidget(mModel);
     mVariantCount = new QLabel(this);
-    mLoadingAnimation = new QMovie(":/squares.gif");
+    mLoadingLabel = new QLabel(this);
+    mLoadingAnimation = new QMovie(":icons/squares.gif");
     mChromBox     = new QComboBox;
 
 
@@ -49,6 +50,8 @@ MainWindow::MainWindow(QWidget *parent) :
     QAction * searchAction = mSearchEdit->addAction(QFontIcon::icon(0xf002),QLineEdit::TrailingPosition);
 
 
+    mLoadingLabel->setMovie(mLoadingAnimation);
+    mLoadingAnimation->jumpToNextFrame();
 
     // mSearchEdit is inside a QtoolBar
     mMainToolBar = new QToolBar("main toolbar");
@@ -59,6 +62,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     mMainToolBar->addWidget(mChromBox);
     mMainToolBar->addWidget(mSearchEdit);
+    mMainToolBar->addWidget(mLoadingLabel);
 
 
     addToolBar(Qt::TopToolBarArea, mMainToolBar);
@@ -395,14 +399,10 @@ void MainWindow::createMenuBar()
 
 void MainWindow::loadingChanged()
 {
-    qDebug()<<"LoadingChange"<< mModel->isLoading();
 
     bool enable = mModel->isLoading();
 
     if (enable){
-        mVariantCount->setText(QString());
-        mVariantCount->setMovie(mLoadingAnimation);
-
         mLoadingAnimation->start();
     }
     else{
