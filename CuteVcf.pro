@@ -59,9 +59,7 @@ HEADERS  += mainwindow.h \
     createindexdialog.h
 
 RESOURCES += \
-    icons/icons.qrc
-
-DISTFILES += \
-    icons/squares.gif
+    icons/icons.qrc \
+    files.qrc
 
 

@@ -8,12 +8,19 @@ class AboutDialog : public QDialog
 public:
     explicit AboutDialog(QWidget *parent = 0);
 
+public Q_SLOTS:
+    void openGithub();
+
 protected:
-    void makeHeader();
+    void appendTab(const QString& filename, const QString& label);
+
 
 private:
 QTabWidget * mTabWidget;
 QDialogButtonBox * mButtons;
+
+QPushButton * mCancelButton;
+QPushButton * mGithubButton;
 
 
 };

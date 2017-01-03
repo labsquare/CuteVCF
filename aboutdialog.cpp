@@ -10,9 +10,14 @@ AboutDialog::AboutDialog(QWidget *parent) : QDialog(parent)
     QLabel * mIconLabel = new QLabel;
     QLabel * mTitleLabel = new QLabel;
 
+
+    mCancelButton = new QPushButton(tr("Cancel"));
+    mGithubButton = new QPushButton(tr("Github"));
+
     mIconLabel->setPixmap(QPixmap(":/app.png").scaledToHeight(64, Qt::SmoothTransformation));
-    mTitleLabel->setText(qApp->applicationName());
-    mTitleLabel->setAlignment(Qt::AlignLeft);
+    mIconLabel->setFixedWidth(64);
+    mTitleLabel->setText(qApp->applicationName()+" "+qApp->applicationVersion());
+    mTitleLabel->setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
     QFont font;
     font.setPixelSize(25);
     mTitleLabel->setFont(font);
@@ -20,48 +25,49 @@ AboutDialog::AboutDialog(QWidget *parent) : QDialog(parent)
     QHBoxLayout * hLayout = new QHBoxLayout;
     hLayout->addWidget(mIconLabel);
     hLayout->addWidget(mTitleLabel);
+    hLayout->setAlignment(mTitleLabel,Qt::AlignLeft);
+
+    QHBoxLayout * bLayout = new QHBoxLayout;
+    bLayout->addWidget(mGithubButton);
+    bLayout->addStretch();
+    bLayout->addWidget(mCancelButton);
+
 
     QVBoxLayout * vLayout = new QVBoxLayout;
     vLayout->addLayout(hLayout);
     vLayout->addWidget(mTabWidget);
+    vLayout->addLayout(bLayout);
 
-   QPlainTextEdit * edit =  new QPlainTextEdit;
-   edit->setPlainText(QString("Version: %1").arg(qApp->applicationVersion()));
-
-  mTabWidget->addTab(edit, "Version");
 
     setLayout(vLayout);
+    setFixedSize(500,500);
+
+    appendTab(":README", tr("About"));
+    appendTab(":CHANGELOG", tr("Version"));
+    appendTab(":LICENSE", tr("License"));
+    appendTab(":AUTHORS", tr("Authors"));
+
+
+    connect(mCancelButton,SIGNAL(clicked(bool)),this,SLOT(close()));
+    connect(mGithubButton,SIGNAL(clicked(bool)),this,SLOT(openGithub()));
 
 
 }
 
-void AboutDialog::makeHeader()
+void AboutDialog::openGithub()
+{
+    QDesktopServices::openUrl(QUrl("http://github.com/labsquare/CuteVCF"));
+
+}
+
+void AboutDialog::appendTab(const QString &filename, const QString &label)
 {
 
-//    QPixmap pix(width(), height()/2);
-//    pix.fill(Qt::white);
-
-//    QPainter painter(&pix);
-
-//    QPixmap logo = QPixmap(":/app.png");
-//    int size = 128;
-//    int margin = (pix.height() - size) / 2  ;
-
-//    painter.drawPixmap(0,margin,logo);
-
-//    QRect area(130, 0, pix.width()-130, pix.height() );
-
-//    QFont font;
-//    font.setPixelSize(30);
-//    painter.setFont(font);
-
-//    painter.drawText(area, Qt::AlignLeft|Qt::AlignVCenter, qApp->applicationName() + "\n" + qApp->applicationVersion());
-
-
-//    mHeader->setPixmap(pix);
-//    mHeader->setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
-//    mHeader->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
-
-
-
+    QFile file(filename);
+    if (file.open(QIODevice::Text|QIODevice::ReadOnly))
+    {
+       QPlainTextEdit * edit = new QPlainTextEdit;
+       mTabWidget->addTab(edit, label);
+       edit->setPlainText(file.readAll());
+    }
 }

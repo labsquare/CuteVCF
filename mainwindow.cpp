@@ -29,6 +29,8 @@ MainWindow::MainWindow(QWidget *parent) :
     mSearchEdit->completer()->setCaseSensitivity(Qt::CaseInsensitive);
     mSearchEdit->addAction(QIcon::fromTheme("system-search"),QLineEdit::LeadingPosition);
 
+
+
     // mSearchEdit is inside a QtoolBar
     mMainToolBar = new QToolBar("main toolbar");
     mMainToolBar->setFloatable(false);

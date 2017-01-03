@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file>LICENSE</file>
+        <file>AUTHORS</file>
+        <file>README</file>
+        <file>CHANGELOG</file>
+    </qresource>
+</RCC>
