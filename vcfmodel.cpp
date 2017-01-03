@@ -33,12 +33,13 @@ VcfModel::VcfModel(QObject * parent):
 
 int VcfModel::rowCount(const QModelIndex &parent) const
 {
+    Q_UNUSED(parent)
     return mLines.count();
 }
 
 int VcfModel::columnCount(const QModelIndex &parent) const
 {
-
+    Q_UNUSED(parent)
     return 7;
 }
 
@@ -104,11 +105,11 @@ void VcfModel::load()
     {
         while (mTabixFile.readLineInto(line))
         {
-            if (mRealCount < MAX_ITEMS)
-            {
+//            if (mRealCount < MAX_ITEMS)
+//            {
                 VcfLine item = VcfLine::fromLine(line) ;
                 mTampons.append(item);
-            }
+//            }
             mRealCount++;
         }
     }

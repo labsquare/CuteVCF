@@ -31,7 +31,7 @@ MainWindow::MainWindow(QWidget *parent) :
     mChromBox     = new QComboBox;
 
 
-    setWindowIcon(QIcon(":/app.png"));
+    setWindowIcon(QIcon(":icons/app.png"));
 
     // set the main table view properties
     mView->setModel(mModel);
@@ -46,7 +46,7 @@ MainWindow::MainWindow(QWidget *parent) :
     mSearchEdit->setPlaceholderText(tr("Select a region... <chr> or <chr:start-end>"));
     mSearchEdit->setCompleter(new QCompleter);
     mSearchEdit->completer()->setCaseSensitivity(Qt::CaseInsensitive);
-    mSearchEdit->addAction(QIcon::fromTheme("system-search"),QLineEdit::LeadingPosition);
+    QAction * searchAction = mSearchEdit->addAction(QFontIcon::icon(0xf002),QLineEdit::TrailingPosition);
 
 
 
@@ -55,15 +55,16 @@ MainWindow::MainWindow(QWidget *parent) :
     mMainToolBar->setFloatable(false);
     mMainToolBar->setAllowedAreas(Qt::TopToolBarArea);
     mMainToolBar->setMovable(false);
+    mMainToolBar->setToolButtonStyle(Qt::ToolButtonFollowStyle);
+
+    mMainToolBar->addWidget(mChromBox);
+    mMainToolBar->addWidget(mSearchEdit);
+
+
     addToolBar(Qt::TopToolBarArea, mMainToolBar);
 
-    QToolBar * searchToolBar = new QToolBar("search bar");
-    searchToolBar->setFloatable(false);
-    searchToolBar->setMovable(false);
-    searchToolBar->addWidget(mChromBox);
-    searchToolBar->addWidget(mSearchEdit);
 
-    addToolBar(Qt::TopToolBarArea, searchToolBar);
+
 
 
 
@@ -80,6 +81,7 @@ MainWindow::MainWindow(QWidget *parent) :
     addDockWidget(Qt::RightDockWidgetArea, mSampleDock);
 
     connect(mSearchEdit,SIGNAL(returnPressed()),this,SLOT(loadRegion()));
+    connect(searchAction,SIGNAL(triggered(bool)),this,SLOT(loadRegion()));
     connect(mView->selectionModel(),SIGNAL(currentRowChanged(QModelIndex,QModelIndex)),mInfoWidget,SLOT(setLine(QModelIndex)));
     connect(mView->selectionModel(),SIGNAL(currentRowChanged(QModelIndex,QModelIndex)),mSampleWidget,SLOT(setLine(QModelIndex)));
     connect(mModel,SIGNAL(loadingChanged()),this,SLOT(loadingChanged()));
@@ -96,7 +98,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     resize(800,600);
 
-    setStyleSheet("QMainWindow::separator{margin:0px;padding:0px; width:3px}");
+    //    setStyleSheet("QMainWindow::separator{margin:0px;padding:0px; width:3px}");
     //   setStyleSheet("QDockWidget::title{margin:0px;}");
     //   setStyleSheet("QTableView{margin:0px;}");
     //   setStyleSheet("QDockWidget{margin:0px;}");
@@ -160,7 +162,7 @@ void MainWindow::setFilename(const QString &filename)
             mChromBox->setModel(new QStringListModel(mModel->chromosoms()));
 
             // by defaut, set to the chromosom 1
-//            mSearchEdit->setText(mModel->chromosoms().last());
+            //            mSearchEdit->setText(mModel->chromosoms().last());
 
             loadRegion();
 
@@ -215,7 +217,7 @@ void MainWindow::showRawHeader()
     vLayout->addWidget(buttonBox);
     dialog->setLayout(vLayout);
 
-    QObject::connect(buttonBox,SIGNAL(rejected()), dialog,SLOT(reject()));
+    QObject::connect(buttonBox,SIGNAL(rejected()),dialog,SLOT(close()));
     mEdit->setPlainText(mModel->header().raw());
     dialog->resize(600,400);
     dialog->setWindowTitle(tr("Raw header"));
@@ -232,9 +234,13 @@ void MainWindow::showInfo()
     QDialog * dialog = new QDialog;
     QVBoxLayout * dLayout  = new QVBoxLayout(dialog);
     QTabWidget * tabWidget = new QTabWidget(dialog);
+    QDialogButtonBox * buttonBox = new QDialogButtonBox(QDialogButtonBox::Close);
+
     dLayout->addWidget(tabWidget);
+    dLayout->addWidget(buttonBox);
     dialog->setLayout(dLayout);
 
+    QObject::connect(buttonBox,SIGNAL(rejected()),dialog,SLOT(close()));
     QTreeWidget * tagsView = new QTreeWidget(dialog);
     tagsView->setColumnCount(2);
     tagsView->setHeaderLabels(QStringList()<<"Key"<<"Value");
@@ -249,8 +255,9 @@ void MainWindow::showInfo()
 
     tagsView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
     tabWidget->addTab(tagsView, tr("Tags"));
+    dialog->setWindowTitle(tr("Information"));
 
-    dialog->resize(500,700);
+    dialog->resize(500,500);
     dialog->exec();
 
 
@@ -332,25 +339,23 @@ void MainWindow::createMenuBar()
 
     // File menu
     QMenu * fileMenu = bar->addMenu(tr("&File"));
-    QAction * openAction = fileMenu->addAction(QIcon::fromTheme("document-open"), tr("Open of vcf file"),this,SLOT(openFile()),QKeySequence::Open);
+    fileMenu->addAction(QFontIcon::icon(0xf115), tr("&Open of vcf file"),this,SLOT(openFile()),QKeySequence::Open);
 
-    QMenu * recentFile = new QMenu(tr("Recent files"));
+    QMenu * recentFile = new QMenu(tr("&Recent files"));
     for (QString recent : loadRecent())
         recentFile->addAction(recent,this,SLOT(recentClicked()));
 
     fileMenu->addMenu(recentFile);
 
 
-    QAction * saveAction = fileMenu->addAction(QIcon::fromTheme("document-save-as"),tr("Export to CSV"),this,SLOT(exportCsv()),QKeySequence::Save);
-    fileMenu->addAction(QIcon::fromTheme("application-exit"),tr("Close"),qApp, SLOT(closeAllWindows()), QKeySequence::Quit);
+    fileMenu->addAction(QFontIcon::icon(0xf0c7),tr("&Export to CSV"),this,SLOT(exportCsv()),QKeySequence::Save);
+    fileMenu->addAction(QFontIcon::icon(0xf08b),tr("&Quit"),qApp, SLOT(closeAllWindows()), QKeySequence::Quit);
 
-    mMainToolBar->addAction(openAction);
-    mMainToolBar->addAction(saveAction);
 
 
     // Edit menu
     QMenu * editMenu = bar->addMenu(tr("&Edit"));
-    editMenu->addAction(tr("Set region ..."), this, SLOT(focusRegionEdit()), QKeySequence::Find);
+    editMenu->addAction(QFontIcon::icon(0xf002),tr("Set region ..."), this, SLOT(focusRegionEdit()), QKeySequence::Find);
 
 
     // Window menu
@@ -364,24 +369,26 @@ void MainWindow::createMenuBar()
     sampleAction->setChecked(true);
 
     viewMenu->addSeparator();
-    viewMenu->addAction(QIcon(),tr("Show raw header"),this, SLOT(showRawHeader()));
-    viewMenu->addAction(QIcon(),tr("Show info"),this, SLOT(showInfo()));
+    viewMenu->addAction(QFontIcon::icon(0xf06e),tr("Show raw header"),this, SLOT(showRawHeader()));
+    viewMenu->addAction(QFontIcon::icon(0xf06e),tr("Show information"),this, SLOT(showInfo()));
 
 
 
     // Help menu
     QMenu * helpMenu = bar->addMenu(tr("&Help"));
-    helpMenu->addAction(QIcon::fromTheme("help-about"),tr("About %1").arg(qApp->applicationName()),this,SLOT(showAbout()));
-    helpMenu->addAction(QIcon::fromTheme("help-about"),tr("About Qt"),qApp,SLOT(aboutQt()));
+    helpMenu->addAction(QFontIcon::icon(0xf129),tr("About %1").arg(qApp->applicationName()),this,SLOT(showAbout()));
+    helpMenu->addAction(QFontIcon::icon(0xf129),tr("About Qt"),qApp,SLOT(aboutQt()));
 
 
     setMenuBar(bar);
 
 
-    QWidget * empty = new QWidget;
-    empty->setMinimumWidth(350);
-    empty->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
-    mMainToolBar->addWidget(empty);
+    //    QWidget * empty = new QWidget;
+    //    empty->setMinimumWidth(50);
+    //    empty->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
+    //    mMainToolBar->addWidget(empty);
+
+
 
 
 }
@@ -464,7 +471,6 @@ void MainWindow::recentClicked()
 void MainWindow::chromboxChanged()
 {
 
-    qDebug()<<"salut";
     mSearchEdit->setText(mChromBox->currentText());
     loadRegion();
 

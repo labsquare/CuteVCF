@@ -17,13 +17,12 @@ along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 @author : Sacha Schutz <sacha@labsquare.org>
 */
 
-#include "mainwindow.h"
 #include <QApplication>
 #include <QDebug>
 #include <QTableView>
-#include "vcfmodel.h"
-#include <cstdarg>
 
+#include "mainwindow.h"
+#include "qfonticon.h"
 
 int main(int argc, char *argv[])
 {
@@ -34,6 +33,11 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationDomain("labsquare.org");
     QCoreApplication::setOrganizationName("labsquare");
     QCoreApplication::setApplicationVersion("0.1.0");
+
+
+
+    if (!QFontIcon::addFont(":/fonts/fontawesome.ttf"))
+        qCritical()<<"Cannot add font";
 
 
 
