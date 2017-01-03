@@ -32,6 +32,8 @@ LIBS += -L$$PWD/win32 -lhts
 
 INCLUDEPATH += $$PWD/htslib
 DEPENDPATH += $$PWD/htslib
+
+RC_ICONS =app.ico
 }
 
 
