@@ -74,7 +74,7 @@ IF(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
         SET(CPACK_SOURCE_PACKAGE_FILE_NAME "${CPACK_DEBIAN_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}_source")
 
         # dependencies
-        SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6 (>= 2.19), libgcc1 (>= 1:4.9.2), libgl1-mesa-glx (>= 10.3.2), libglib2.0-0 (>= 2.42.1), libhts1 (>= 1.1), libpcre3 (>= 2:8.35), libstdc++6 (>= 4.9.2), libx11-6 (>= 2:1.6.2), libxau6 (>= 1:1.0.8), libxcb1 (>= 1.10), libxdmcp6 (>= 1:1.1.1), libxext6 (>= 2:1.3.3), zlib1g (>= 1:1.2.8)")
+        SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libhts1 (>= 1.1), libqt5widgets5 (>=5.7.0), libqt5concurrent5 (>=5.7.0), libqt5gui5 (>=5.7.0), libqt5core5a (>=5.7.0), libc6 (>= 2.19), libgcc1 (>= 1:4.9.2), libgl1-mesa-glx (>= 10.3.2), libglib2.0-0 (>= 2.42.1), libpcre3 (>= 2:8.35), libstdc++6 (>= 4.9.2), libx11-6 (>= 2:1.6.2), libxau6 (>= 1:1.0.8), libxcb1 (>= 1.10), libxdmcp6 (>= 1:1.1.1), libxext6 (>= 2:1.3.3), zlib1g (>= 1:1.2.8)")
         # May be set to ON in order to use dpkg-shlibdeps to generate better package dependency list.
         # You may need set CMAKE_INSTALL_RPATH toi appropriate value if you use this feature,
         # because if you don’t dpkg-shlibdeps may fail to find your own shared libs.
