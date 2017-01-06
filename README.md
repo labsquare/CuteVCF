@@ -14,4 +14,13 @@ Only tested on Linux for now. But binary will come soon after compiling htslib o
 ## From Shell  
 
     qmake CuteVcf.pro 
-    make 
+    make
+
+# Install
+
+## From Shell
+
+    qmake INSTALL\_PREFIX=my/install/prefix CuteVcf.pro
+    make
+    make install
+ 
