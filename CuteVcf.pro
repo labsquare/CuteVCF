@@ -32,13 +32,15 @@ LIBS += -L$$PWD/win32 -lhts
 
 INCLUDEPATH += $$PWD/htslib
 DEPENDPATH += $$PWD/htslib
+
+RC_ICONS = app.ico
 }
 
 
 include("QFontIcon/QFontIcon.pri")
 
 
-
+ICON = myapp.icns
 
 
 RESOURCES += files.qrc
@@ -65,3 +67,22 @@ SOURCES += \
     vcfheader.cpp \
     vcfline.cpp \
     vcfmodel.cpp
+
+# Define install path
+isEmpty(INSTALL_PREFIX){
+    INSTALL_PREFIX=$$PWD
+}
+
+binary.path = $$INSTALL_PREFIX/bin/
+binary.files = $$PWD/CuteVCF
+
+INSTALLS += binary
+
+unix{
+
+library.path += $$INSTALL_PREFIX/lib/
+library.files += $$PWD/htslib/libhts.so*
+
+INSTALLS += library
+}
+
