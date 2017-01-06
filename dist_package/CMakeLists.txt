@@ -52,14 +52,15 @@ IF(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
         # Choose it via cpack -g <variable>
         SET(CPACK_GENERATOR "DEB")
 
-        # misc
+        # Misc
         SET(CPACK_DEBIAN_PACKAGE_NAME "${EXECUTABLE_NAME}")
+        SET(CPACK_DEBIAN_ARCHITECTURE ${CMAKE_SYSTEM_PROCESSOR}) # amd64
         SET(CPACK_DEBIAN_PACKAGE_SECTION "devel") # default
         SET(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
         SET(CPACK_DEBIAN_PACKAGE_HOMEPAGE "http://github.com/labsquare/CuteVCF")
         SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "Ysard <sacha@labsquare.org>")
 
-        # version
+        # Version
         # https://wiki.debian.org/DebianMentorsFaq#What_is_the_difference_between_a_native_Debian_package_and_a_non-native_package.3F
         # - Non native: 0.1.1-1: -1 revision number for Debian
         # - Native: 0.1.1
@@ -73,7 +74,7 @@ IF(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
         SET(CPACK_PACKAGE_FILE_NAME "${CPACK_DEBIAN_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}_amd64")
         SET(CPACK_SOURCE_PACKAGE_FILE_NAME "${CPACK_DEBIAN_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}_source")
 
-        # dependencies
+        # Dependencies
         SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6 (>= 2.19), libgcc1 (>= 1:4.9.2), libgl1-mesa-glx (>= 10.3.2), libglib2.0-0 (>= 2.42.1), libhts1 (>= 1.1), libpcre3 (>= 2:8.35), libstdc++6 (>= 4.9.2), libx11-6 (>= 2:1.6.2), libxau6 (>= 1:1.0.8), libxcb1 (>= 1.10), libxdmcp6 (>= 1:1.1.1), libxext6 (>= 2:1.3.3), zlib1g (>= 1:1.2.8)")
         # May be set to ON in order to use dpkg-shlibdeps to generate better package dependency list.
         # You may need set CMAKE_INSTALL_RPATH toi appropriate value if you use this feature,
@@ -96,9 +97,11 @@ IF(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
         #     all, which indicates an architecture-independent package.
         #
         #     source, which indicates a source package.
-        SET(CPACK_DEBIAN_ARCHITECTURE ${CMAKE_SYSTEM_PROCESSOR}) # amd64
 
-        # license file
+        # Build dependencies
+        # mesa-common-dev libhts-dev
+
+        # License file
         file(WRITE "${CMAKE_BINARY_DIR}/copyright"
 "Copyright (C) 2016 ${CPACK_PACKAGE_CONTACT}
 
@@ -124,7 +127,7 @@ License can be found in `/usr/share/common-licenses/GPL-3'.")
                 GROUP_READ
                 WORLD_READ)
 
-        # changelogs
+        # Changelogs
         # https://wiki.debian.org/DebianMentorsFaq#What_is_the_difference_between_a_native_Debian_package_and_a_non-native_package.3F
         # https://www.debian.org/doc/debian-policy/ch-docs.html#s-changelogs
         # - native: debian specific (apt, dpkg, etc.) => /usr/share/doc/pkg/changelog.gz
@@ -185,6 +188,7 @@ License can be found in `/usr/share/common-licenses/GPL-3'.")
         #                 WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
         #                 OUTPUT_FILE "${CMAKE_BINARY_DIR}/changelog.gz")
         # Non native
+        # Process file & move it
         configure_file(${CMAKE_CURRENT_SOURCE_DIR}/../CHANGELOG.in
                         ${CMAKE_CURRENT_BINARY_DIR}/changelog.Debian)
         execute_process(COMMAND gzip -9 -c ${CMAKE_CURRENT_BINARY_DIR}/changelog.Debian
@@ -194,6 +198,34 @@ License can be found in `/usr/share/common-licenses/GPL-3'.")
                     #"${CMAKE_BINARY_DIR}/changelog.gz"
                     DESTINATION "share/doc/${CPACK_DEBIAN_PACKAGE_NAME}")
 
+
+        # Desktop file
+        file(WRITE "${CMAKE_BINARY_DIR}/${CPACK_DEBIAN_PACKAGE_NAME}.desktop"
+"[Desktop Entry]
+Version=${VERSION}
+Type=Application
+Name=${PROJECT_NAME}
+Comment=Genomics variant viewer according to the VCF specification.
+TryExec=${EXECUTABLE_NAME}
+Exec=${EXECUTABLE_NAME} %F
+Terminal=false
+Icon=/usr/share/pixmaps/${EXECUTABLE_NAME}.svg
+Categories=Application;Education;Science;")
+        configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../design/icons.svg"
+                       "${CMAKE_BINARY_DIR}/${EXECUTABLE_NAME}.svg")
+        install(FILES "${CMAKE_BINARY_DIR}/${CPACK_DEBIAN_PACKAGE_NAME}.desktop"
+                DESTINATION "share/applications/"
+                PERMISSIONS
+                OWNER_WRITE OWNER_READ
+                GROUP_READ
+                WORLD_READ)
+        install(FILES "${CMAKE_BINARY_DIR}/${EXECUTABLE_NAME}.svg"
+                DESTINATION "share/pixmaps/"
+                PERMISSIONS
+                OWNER_WRITE OWNER_READ
+                GROUP_READ
+                WORLD_READ)
+
     ENDIF(WIN32 AND NOT UNIX)
 
     # Lists each of the executables and associated text label to be used to create Start Menu shortcuts.
@@ -201,7 +233,6 @@ License can be found in `/usr/share/common-licenses/GPL-3'.")
     # Not all CPack generators use it (at least NSIS, WIX and OSXX11 do).
     SET(CPACK_PACKAGE_EXECUTABLES ${EXECUTABLE_NAME};${PROJECT_NAME})
 
-    SET(CPACK_COMPONENTS_ALL Libraries ApplicationData)
     INCLUDE(CPack)
 
 ENDIF(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
