@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with CuteVCF.  If not, see <http://www.gnu.org/licenses/>.
 #
-# Copyright 2013-2016
+# Copyright 2016 Labsquare <sacha@labsquare.org>
 
 # We require CMake >= 3.0
 # Minimal version is needed in order to avoid warnings

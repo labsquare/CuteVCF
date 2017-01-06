@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with CuteVCF.  If not, see <http://www.gnu.org/licenses/>.
 #
-# Copyright 2013-2016
+# Copyright 2016 Labsquare <sacha@labsquare.org>
 
 # https://cmake.org/cmake/help/v3.0/module/CPackDeb.html
 # https://cmake.org/Wiki/CMake:CPackPackageGenerators#DEB_.28UNIX_only.29
