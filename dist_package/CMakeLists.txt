@@ -23,9 +23,7 @@ IF(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
     SET(CPACK_SET_DESTDIR "on")
     SET(CPACK_PACKAGING_INSTALL_PREFIX "/tmp")
 
-
-
-    # user informations
+    # Informations
     SET(CPACK_RESOURCE_FILE_LICENSE "../LICENSE")
     # https://www.debian.org/doc/debian-policy/ch-binary.html#s-descriptions
     # https://www.debian.org/doc/debian-policy/ch-controlfields.html#s-f-Description
@@ -39,22 +37,37 @@ IF(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
     SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Genomics variant viewer according to the VCF specification.
  You can open vcf.gz file and read all information related to a variant.
  GUI is made with Qt 5.7 and vcf are reading with htslib.")
-    # SET(CPACK_PACKAGE_VENDOR "")
     SET(CPACK_PACKAGE_CONTACT "Labsquare <sacha@labsquare.org>")
 
-# if(NOT CMAKE_SYSTEM_NAME STREQUAL "Linux")
-#     message(FATAL_ERROR "Cannot configure CPack to generate Debian packages on non-linux systems.")
-# endif()
-    # dependencies
+    # Platform specific config
     IF(WIN32 AND NOT UNIX)
+        # TODO
+        MESSAGE(FATAL_ERROR "Cannot configure CPack to generate packages on non-linux systems.")
 
     ELSE(WIN32 AND NOT UNIX)
-        # Choose it via cpack -g <variable>
+        # Choose it via cpack -G <variable>
         SET(CPACK_GENERATOR "DEB")
 
         # Misc
+        # Architecture
+        # https://www.debian.org/doc/debian-policy/ch-controlfields.html#s-f-Architecture
+        # Depending on context and the control file used, the Architecture field can include the following sets of values:
+        #
+        #     A unique single word identifying a Debian machine architecture as described in Architecture
+        #     specification strings, Section 11.1.
+        #
+        #     An architecture wildcard identifying a set of Debian machine architectures,
+        #     see Architecture wildcards, Section 11.1.1. any matches all Debian machine architectures
+        #     and is the most frequently used.
+        #
+        #     all, which indicates an architecture-independent package.
+        #
+        #     source, which indicates a source package.
         SET(CPACK_DEBIAN_PACKAGE_NAME "${EXECUTABLE_NAME}")
         SET(CPACK_DEBIAN_ARCHITECTURE ${CMAKE_SYSTEM_PROCESSOR}) # amd64
+        # CPACK_PACKAGE_FILE_NAME: package_version-revision_arch.deb
+        SET(CPACK_PACKAGE_FILE_NAME "${CPACK_DEBIAN_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}_amd64")
+        SET(CPACK_SOURCE_PACKAGE_FILE_NAME "${CPACK_DEBIAN_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}_source")
         SET(CPACK_DEBIAN_PACKAGE_SECTION "devel") # default
         SET(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
         SET(CPACK_DEBIAN_PACKAGE_HOMEPAGE "http://github.com/labsquare/CuteVCF")
@@ -70,10 +83,6 @@ IF(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
         # SET(CPACK_PACKAGE_VERSION_PATCH "${PATCH_VERSION}")
         SET(CPACK_PACKAGE_VERSION "${VERSION}-${DEBIAN_PACKAGE_NON_NATIVE_REVISION}")
 
-        # CPACK_PACKAGE_FILE_NAME: package_version-revision_arch.deb
-        SET(CPACK_PACKAGE_FILE_NAME "${CPACK_DEBIAN_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}_amd64")
-        SET(CPACK_SOURCE_PACKAGE_FILE_NAME "${CPACK_DEBIAN_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}_source")
-
         # Dependencies
         SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libhts1 (>= 1.1), libqt5widgets5 (>=5.7.0), libqt5concurrent5 (>=5.7.0), libqt5gui5 (>=5.7.0), libqt5core5a (>=5.7.0), libc6 (>= 2.19), libgcc1 (>= 1:4.9.2), libgl1-mesa-glx (>= 10.3.2), libglib2.0-0 (>= 2.42.1), libpcre3 (>= 2:8.35), libstdc++6 (>= 4.9.2), libx11-6 (>= 2:1.6.2), libxau6 (>= 1:1.0.8), libxcb1 (>= 1.10), libxdmcp6 (>= 1:1.1.1), libxext6 (>= 2:1.3.3), zlib1g (>= 1:1.2.8)")
         # May be set to ON in order to use dpkg-shlibdeps to generate better package dependency list.
@@ -83,23 +92,8 @@ IF(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
         # https://www.debian.org/doc/debian-policy/ch-sharedlibs.html#s-dpkg-shlibdeps
         #SET(CPACK_DEBIAN_PACKAGE_SHLIBDEPS "ON")
 
-        # architecture
-        # https://www.debian.org/doc/debian-policy/ch-controlfields.html#s-f-Architecture
-        # Depending on context and the control file used, the Architecture field can include the following sets of values:
-        #
-        #     A unique single word identifying a Debian machine architecture as described in Architecture
-        #     specification strings, Section 11.1.
-        #
-        #     An architecture wildcard identifying a set of Debian machine architectures,
-        #     see Architecture wildcards, Section 11.1.1. any matches all Debian machine architectures
-        #     and is the most frequently used.
-        #
-        #     all, which indicates an architecture-independent package.
-        #
-        #     source, which indicates a source package.
-
         # Build dependencies
-        # mesa-common-dev libhts-dev
+        #SET(DEBIAN_PACKAGE_BUILDS_DEPENDS "mesa-common-dev, libhts-dev")
 
         # License file
         file(WRITE "${CMAKE_BINARY_DIR}/copyright"
