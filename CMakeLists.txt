@@ -20,8 +20,8 @@
 cmake_minimum_required(VERSION 3.0)
 
 # Set projectname (must be done AFTER setting configurationtypes)
-set(VERSION "0.2.0")
 project(CuteVCF)
+set(VERSION "0.2.0")
 
 # add dependencies
 # Find includes in corresponding build directories
@@ -35,7 +35,15 @@ if(UNIX)
     # In order for find_package to be successful, Qt 5 must be found below the CMAKE_PREFIX_PATH
     # http://doc.qt.io/qt-5/cmake-manual.html
     set(CMAKE_PREFIX_PATH "/media/DATA/Qt5.7.0/5.7/gcc_64/" "/media/DATA/Qt5.7.0/5.7/gcc_64/lib/")
+
+    # Set executable name (lower case on GNU/Linux)
+    string(TOLOWER "${PROJECT_NAME}" EXECUTABLE_NAME)
+
+else()
+    # Set executable name
+    set(EXECUTABLE_NAME "${PROJECT_NAME}")
 endif()
+
 
 # Find the QtWidgets library
 find_package(Qt5Widgets REQUIRED)
@@ -90,7 +98,7 @@ qt5_add_resources(UI_RESOURCES files.qrc)
 # Add QFontIcon header
 include_directories(QFontIcon)
 add_executable(
-    CuteVCF #Target names may not contain slashes. This is not a supported use case.
+    ${EXECUTABLE_NAME} #Target names may not contain slashes. This is not a supported use case.
     ../aboutdialog.h
     ../createindexdialog.h
     ../infowidget.h
@@ -133,7 +141,7 @@ endif()
 
 if(HTS_LIB)
     target_link_libraries(
-          CuteVCF
+          ${EXECUTABLE_NAME}
           # We want to use the system lib
           ${HTS_LIB}
           # Use the following modules from Qt 5.
@@ -143,7 +151,7 @@ if(HTS_LIB)
 # else()
 #     # Try to use the pre-compiled library
 #     target_link_libraries(
-#         CuteVCF
+#         ${EXECUTABLE_NAME}
 #         library.a
 #         Qt5::Widgets
 #         Qt5::Concurrent
@@ -159,7 +167,7 @@ endif()
 if(UNIX)
     # ${CMAKE_INSTALL_PREFIX} : /usr/local/
     set(CMAKE_INSTALL_PREFIX "/usr/")
-    INSTALL(TARGETS CuteVCF
+    INSTALL(TARGETS ${EXECUTABLE_NAME}
             DESTINATION "${CMAKE_INSTALL_PREFIX}bin")
 
     # Debian package
@@ -168,7 +176,7 @@ if(UNIX)
 endif()
 
 #if(WIN32)
-#    INSTALL(TARGETS CuteVCF DESTINATION c:/windows/)
+#    INSTALL(TARGETS ${EXECUTABLE_NAME} DESTINATION c:/windows/)
 #endif()
 
 

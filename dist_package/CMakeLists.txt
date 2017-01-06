@@ -53,7 +53,7 @@ IF(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
         SET(CPACK_GENERATOR "DEB")
 
         # misc
-        SET(CPACK_DEBIAN_PACKAGE_NAME "cutevcf")
+        SET(CPACK_DEBIAN_PACKAGE_NAME "${EXECUTABLE_NAME}")
         SET(CPACK_DEBIAN_PACKAGE_SECTION "devel") # default
         SET(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
         SET(CPACK_DEBIAN_PACKAGE_HOMEPAGE "http://github.com/labsquare/CuteVCF")
@@ -199,7 +199,7 @@ License can be found in `/usr/share/common-licenses/GPL-3'.")
     # Lists each of the executables and associated text label to be used to create Start Menu shortcuts.
     # For example, setting this to the list ccmake;CMake will create a shortcut named “CMake”
     # Not all CPack generators use it (at least NSIS, WIX and OSXX11 do).
-    SET(CPACK_PACKAGE_EXECUTABLES CuteVCF;CuteVCF)
+    SET(CPACK_PACKAGE_EXECUTABLES ${EXECUTABLE_NAME};${PROJECT_NAME})
 
     SET(CPACK_COMPONENTS_ALL Libraries ApplicationData)
     INCLUDE(CPack)
