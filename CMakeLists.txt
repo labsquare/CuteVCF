@@ -128,18 +128,23 @@ find_library(HTS_LIB hts)
 if(HTS_LIB)
     MESSAGE(STATUS "Hts library found at: ${HTS_LIB}")
 else()
-    MESSAGE(FATAL_ERROR "Hts library NOT found ! Please install it")
-#     # Try to use the pre-compiled library
+    MESSAGE(WARNING "Hts library NOT found ! We will download it !")
+    # Try to use the compiled library
+    # => https://github.com/broadinstitute/firepony/blob/master/contrib/htslib.cmake
+    include(ExternalProject)
+    include("htslib/htslib.cmake")
+
 #     find_library(HTS_LIB hts ${lib_dir} NO_DEFAULT_PATH)
-#     if(HTS_LIB)
-#         MESSAGE(STATUS "Hts library found at: ${HTS_LIB}")
-#     else()
-#         MESSAGE(STATUS "Hts library not found at: ${HTS_LIB} => will be built")
-# => https://github.com/broadinstitute/firepony/blob/master/contrib/htslib.cmake
-#     endif()
+      MESSAGE(STATUS ${htslib_LIB})
+#      if(${htslib_LIB})
+#          MESSAGE(STATUS "Hts library successfully compiled at: ${htslib_LIB}")
+#      else()
+#          MESSAGE(FATAL_ERROR "Hts library not found... Please install it manually.")
+#      endif()
 endif()
 
 if(HTS_LIB)
+    # Shared
     target_link_libraries(
           ${EXECUTABLE_NAME}
           # We want to use the system lib
@@ -148,14 +153,27 @@ if(HTS_LIB)
           Qt5::Widgets
           Qt5::Concurrent
     )
-# else()
-#     # Try to use the pre-compiled library
-#     target_link_libraries(
-#         ${EXECUTABLE_NAME}
-#         library.a
-#         Qt5::Widgets
-#         Qt5::Concurrent
-#     )
+else()
+    # Static
+    # Look for dependencies of htslib for static compilation...
+    # Search pthread
+    find_library(PTHREAD pthread)
+    # Search libz
+    # https://cmake.org/cmake/help/v3.0/module/FindZLIB.html
+    find_package(ZLIB REQUIRED )
+    MESSAGE(STATUS "libz found: ${ZLIB_FOUND}")
+    include_directories( ${ZLIB_INCLUDE_DIRS} )
+
+    # Try to use the compiled library
+    target_link_libraries(
+        ${EXECUTABLE_NAME}
+        ${htslib_LIB}
+        ${PTHREAD}
+        ${ZLIB_LIBRARIES}
+        Qt5::Widgets
+        Qt5::Concurrent
+    )
+    add_dependencies(${EXECUTABLE_NAME} htslib)
 endif()
 
 # Build in Release-mode by default if not explicitly set
@@ -165,13 +183,22 @@ endif()
 
 # Installation
 if(UNIX)
+    # Short fix of installation dir...
     # ${CMAKE_INSTALL_PREFIX} : /usr/local/
     set(CMAKE_INSTALL_PREFIX "/usr/")
     INSTALL(TARGETS ${EXECUTABLE_NAME}
             DESTINATION "${CMAKE_INSTALL_PREFIX}bin")
 
     # Debian package
-    add_subdirectory(dist_package)
+    # cpack runs
+    # it includes CPackConfig.cmake
+    # it iterates over the generators listed in that file’s CPACK_GENERATOR list variable
+    # (unless told to use just a specific one via -G on the command line...)
+    # foreach generator, it then
+    #     sets CPACK_GENERATOR to the one currently being iterated
+    #     includes the CPACK_PROJECT_CONFIG_FILE
+    #     produces the package for that generator
+    include(CPackConfig.cmake)
 
 endif()
 
@@ -179,6 +206,7 @@ endif()
 #    INSTALL(TARGETS ${EXECUTABLE_NAME} DESTINATION c:/windows/)
 #endif()
 
+include(CPack)
 
 #notes :
 #make VERBOSE=1

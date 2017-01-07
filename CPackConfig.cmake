@@ -1,38 +1,20 @@
-# This file is part of CuteVCF.
-#
-# CuteVCF is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# CuteVCF is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with CuteVCF.  If not, see <http://www.gnu.org/licenses/>.
-#
-# Copyright 2016 Labsquare <sacha@labsquare.org>
-
 # https://cmake.org/cmake/help/v3.0/module/CPackDeb.html
 # https://cmake.org/Wiki/CMake:CPackPackageGenerators#DEB_.28UNIX_only.29
 IF(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
     INCLUDE(InstallRequiredSystemLibraries)
 
-    SET(CPACK_SET_DESTDIR "on")
-    SET(CPACK_PACKAGING_INSTALL_PREFIX "/tmp")
+    # Choose it via cpack -G <variable>
+    SET(CPACK_GENERATOR "RPM;DEB")
+    SET(CPACK_PROJECT_CONFIG_FILE "${CMAKE_CURRENT_SOURCE_DIR}/dist_package/CPackProjectConfig.txt")
 
     # Informations
-    SET(CPACK_RESOURCE_FILE_LICENSE "../LICENSE")
+    SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
     # https://www.debian.org/doc/debian-policy/ch-binary.html#s-descriptions
     # https://www.debian.org/doc/debian-policy/ch-controlfields.html#s-f-Description
     # under 80 characters. Do not include the package name
     # Lines starting with a single space are part of a paragraph.
     #Description: <single line synopsis>
     # <extended description over several lines>
-    # default: eq to CPACK_PACKAGE_DESCRIPTION_SUMMARY
-    #SET(CPACK_PACKAGE_DESCRIPTION "Genomics variant viewer according to the VCF specification.")
     # Do not try to continue the single line synopsis
     SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Genomics variant viewer according to the VCF specification.
  You can open vcf.gz file and read all information related to a variant.
@@ -45,29 +27,95 @@ IF(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
         MESSAGE(FATAL_ERROR "Cannot configure CPack to generate packages on non-linux systems.")
 
     ELSE(WIN32 AND NOT UNIX)
-        # Choose it via cpack -G <variable>
-        SET(CPACK_GENERATOR "DEB")
 
-        # Misc
+        # Desktop file
+        # Creation
+        # https://specifications.freedesktop.org/desktop-entry-spec/latest/
+        # Entries def:
+        # https://specifications.freedesktop.org/desktop-entry-spec/desktop-entry-spec-0.9.8.html
+        # Categories:
+        # https://specifications.freedesktop.org/menu-spec/latest/apa.html
+        file(WRITE "${CMAKE_BINARY_DIR}/${EXECUTABLE_NAME}.desktop"
+"[Desktop Entry]
+Encoding=UTF-8
+Type=Application
+Name=${PROJECT_NAME}
+GenericName=Viewer of genomic variants
+Comment=Viewer of genomic variants according to the VCF specification.
+TryExec=${EXECUTABLE_NAME}
+Exec=${EXECUTABLE_NAME} %F
+Terminal=false
+Icon=${EXECUTABLE_NAME}
+Categories=Education;Science;")
+        # Move Desktop file
+        install(FILES "${CMAKE_BINARY_DIR}/${EXECUTABLE_NAME}.desktop"
+                DESTINATION "share/applications/"
+                PERMISSIONS
+                OWNER_WRITE OWNER_READ
+                GROUP_READ
+                WORLD_READ)
+        # Move icon
+        configure_file("${CMAKE_CURRENT_SOURCE_DIR}/design/icons.svg"
+                       "${CMAKE_BINARY_DIR}/${EXECUTABLE_NAME}.svg")
+        install(FILES "${CMAKE_BINARY_DIR}/${EXECUTABLE_NAME}.svg"
+                DESTINATION "share/pixmaps/"
+                PERMISSIONS
+                OWNER_WRITE OWNER_READ
+                GROUP_READ
+                WORLD_READ)
+
+
+        # License file
+        # https://www.debian.org/doc/debian-policy/ch-docs.html#s-copyrightfile
+        # Packages should refer to the corresponding files under /usr/share/common-licenses,
+        # rather than quoting them in the copyright file.
+        file(WRITE "${CMAKE_BINARY_DIR}/copyright"
+"Copyright (C) 2016 ${CPACK_PACKAGE_CONTACT}
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+On Debian systems, the complete text of the GNU Lesser General Public
+License can be found in `/usr/share/common-licenses/LGPL-3'.")
+        install(FILES "${CMAKE_BINARY_DIR}/copyright"
+                DESTINATION "share/doc/${EXECUTABLE_NAME}/"
+                PERMISSIONS
+                OWNER_WRITE OWNER_READ
+                GROUP_READ
+                WORLD_READ)
+
         # Architecture
         # https://www.debian.org/doc/debian-policy/ch-controlfields.html#s-f-Architecture
         # Depending on context and the control file used, the Architecture field can include the following sets of values:
         #
-        #     A unique single word identifying a Debian machine architecture as described in Architecture
+        #     - A unique single word identifying a Debian machine architecture as described in Architecture
         #     specification strings, Section 11.1.
         #
-        #     An architecture wildcard identifying a set of Debian machine architectures,
+        #     - An architecture wildcard identifying a set of Debian machine architectures,
         #     see Architecture wildcards, Section 11.1.1. any matches all Debian machine architectures
         #     and is the most frequently used.
         #
-        #     all, which indicates an architecture-independent package.
+        #     - all, which indicates an architecture-independent package.
         #
-        #     source, which indicates a source package.
+        #     - source, which indicates a source package.
+        SET(CPACK_DEBIAN_ARCHITECTURE ${CMAKE_SYSTEM_PROCESSOR}) # Give x86_64, but in control: amd64 != In Package name: x86_64
         SET(CPACK_DEBIAN_PACKAGE_NAME "${EXECUTABLE_NAME}")
-        SET(CPACK_DEBIAN_ARCHITECTURE ${CMAKE_SYSTEM_PROCESSOR}) # amd64
         # CPACK_PACKAGE_FILE_NAME: package_version-revision_arch.deb
-        SET(CPACK_PACKAGE_FILE_NAME "${CPACK_DEBIAN_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}_amd64")
+        # Distro specific => Move to CPACK_PROJECT_CONFIG_FILE
+        # SET(CPACK_PACKAGE_FILE_NAME "${CPACK_DEBIAN_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}_amd64")
         SET(CPACK_SOURCE_PACKAGE_FILE_NAME "${CPACK_DEBIAN_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}_source")
+
+        # Misc
         SET(CPACK_DEBIAN_PACKAGE_SECTION "devel") # default
         SET(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
         SET(CPACK_DEBIAN_PACKAGE_HOMEPAGE "http://github.com/labsquare/CuteVCF")
@@ -93,41 +141,20 @@ IF(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
         #SET(CPACK_DEBIAN_PACKAGE_SHLIBDEPS "ON")
 
         # Build dependencies
-        #SET(DEBIAN_PACKAGE_BUILDS_DEPENDS "mesa-common-dev, libhts-dev")
-
-        # License file
-        file(WRITE "${CMAKE_BINARY_DIR}/copyright"
-"Copyright (C) 2016 ${CPACK_PACKAGE_CONTACT}
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-On Debian systems, the complete text of the GNU Lesser General Public
-License can be found in `/usr/share/common-licenses/GPL-3'.")
-        install(FILES "${CMAKE_BINARY_DIR}/copyright"
-                DESTINATION "share/doc/${CPACK_DEBIAN_PACKAGE_NAME}/"
-                PERMISSIONS
-                OWNER_WRITE OWNER_READ
-                GROUP_READ
-                WORLD_READ)
+        SET(DEBIAN_PACKAGE_BUILDS_DEPENDS "mesa-common-dev, libhts-dev")
 
         # Changelogs
+        # This includes modifications made in the Debian package compared to the upstream one as well as other changes and updates to the package. !!
         # https://wiki.debian.org/DebianMentorsFaq#What_is_the_difference_between_a_native_Debian_package_and_a_non-native_package.3F
         # https://www.debian.org/doc/debian-policy/ch-docs.html#s-changelogs
         # - native: debian specific (apt, dpkg, etc.) => /usr/share/doc/pkg/changelog.gz
         # - non native: debian non specific devel => /usr/share/doc/pkg/changelog.Debian.gz.
 
-        # structure (please respect spaces)
+        # ITP Bug: https://www.debian.org/doc/manuals/developers-reference/ch05.html#newpackage
+        # For official package: Please include a Closes: #nnnnn entry in the changelog of the new
+        # package in order for the bug report to be automatically closed once the new package is installed in the archive
+
+        # Structure (please respect spaces):
         # https://www.debian.org/doc/debian-policy/ch-source.html#s-dpkgchangelog
         # fact be any series of lines starting with at least two spaces,
         # but conventionally each change starts with an asterisk and a separating
@@ -173,18 +200,17 @@ License can be found in `/usr/share/common-licenses/GPL-3'.")
         #     The first two digits indicate the hour difference from UTC
         #     and the last two digits indicate the number of additional minutes difference from UTC.
         #     The last two digits must be in the range 00-59.
-
-
+        #
         # Generate required change log files
         # Native
         # https://code.cor-lab.org/svn/cca/trunk/cca/cpack/CPackDebianConfig.cmake
-        # execute_process(COMMAND gzip -9 -c ${CMAKE_CURRENT_SOURCE_DIR}/../CHANGELOG
+        # execute_process(COMMAND gzip -9 -c ${CMAKE_CURRENT_SOURCE_DIR}/CHANGELOG
         #                 WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
         #                 OUTPUT_FILE "${CMAKE_BINARY_DIR}/changelog.gz")
         # Non native
         # Process file & move it
-        configure_file(${CMAKE_CURRENT_SOURCE_DIR}/../CHANGELOG.in
-                        ${CMAKE_CURRENT_BINARY_DIR}/changelog.Debian)
+        configure_file(${CMAKE_CURRENT_SOURCE_DIR}/dist_package/CHANGELOG_DEB.in
+                       ${CMAKE_CURRENT_BINARY_DIR}/changelog.Debian)
         execute_process(COMMAND gzip -9 -c ${CMAKE_CURRENT_BINARY_DIR}/changelog.Debian
                         WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
                         OUTPUT_FILE "${CMAKE_BINARY_DIR}/changelog.Debian.gz")
@@ -192,33 +218,36 @@ License can be found in `/usr/share/common-licenses/GPL-3'.")
                     #"${CMAKE_BINARY_DIR}/changelog.gz"
                     DESTINATION "share/doc/${CPACK_DEBIAN_PACKAGE_NAME}")
 
+        # Fedora
+        # https://cmake.org/cmake/help/v3.0/module/CPackRPM.html
 
-        # Desktop file
-        file(WRITE "${CMAKE_BINARY_DIR}/${CPACK_DEBIAN_PACKAGE_NAME}.desktop"
-"[Desktop Entry]
-Version=${VERSION}
-Type=Application
-Name=${PROJECT_NAME}
-Comment=Genomics variant viewer according to the VCF specification.
-TryExec=${EXECUTABLE_NAME}
-Exec=${EXECUTABLE_NAME} %F
-Terminal=false
-Icon=/usr/share/pixmaps/${EXECUTABLE_NAME}.svg
-Categories=Application;Education;Science;")
-        configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../design/icons.svg"
-                       "${CMAKE_BINARY_DIR}/${EXECUTABLE_NAME}.svg")
-        install(FILES "${CMAKE_BINARY_DIR}/${CPACK_DEBIAN_PACKAGE_NAME}.desktop"
-                DESTINATION "share/applications/"
-                PERMISSIONS
-                OWNER_WRITE OWNER_READ
-                GROUP_READ
-                WORLD_READ)
-        install(FILES "${CMAKE_BINARY_DIR}/${EXECUTABLE_NAME}.svg"
-                DESTINATION "share/pixmaps/"
-                PERMISSIONS
-                OWNER_WRITE OWNER_READ
-                GROUP_READ
-                WORLD_READ)
+        # Package naming
+        # name-version-release.architecture.rpm
+        # kernel-smp-2.6.32.9-3.x86_64.rpm
+        # TODO: For a specific platform (ex: Fedora 23) the name must be like
+        # "kernel-smp-2.6.32.9-3.fc23.x86_64.rpm" (equiv of {dist} macro: update it !)
+        # Distro specific => Move to CPACK_PROJECT_CONFIG_FILE
+        # SET(CPACK_PACKAGE_FILE_NAME  "${CPACK_DEBIAN_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}.${CMAKE_SYSTEM_PROCESSOR}")
+        SET(CPACK_RPM_PACKAGE_ARCHITECTURE "${CMAKE_SYSTEM_PROCESSOR}")
+        SET(CPACK_RPM_PACKAGE_VERSION "${VERSION}")
+        SET(CPACK_RPM_PACKAGE_RELEASE "1%{?dist}")
+        SET(CPACK_RPM_PACKAGE_SUMMARY "Genomics variant viewer according to the VCF specification")
+        SET(CPACK_RPM_PACKAGE_DESCRIPTION "You can open vcf.gz file and read all information related to a variant.
+GUI is made with Qt 5.7 and vcf are reading with htslib.")
+        SET(CPACK_RPM_PACKAGE_NAME "${EXECUTABLE_NAME}")
+        SET(CPACK_RPM_PACKAGE_GROUP "Science")
+        SET(CPACK_RPM_PACKAGE_LICENSE "GPLv3")
+        SET(CPACK_RPM_PACKAGE_URL ${CPACK_DEBIAN_PACKAGE_HOMEPAGE})
+        SET(CPACK_RPM_PACKAGE_REQUIRES "qt5-qtbase-gui >= 5.7.0, qt5-qtbase >= 5.7.0, libstdc++ >= 5.1.1, glibc >= 2.22, libgcc >= 5.1.1, zlib >= 1.2.8, mesa-libGL >= 11.0.3, libxcb >= 1.11, libxshmfence >= 1.2, mesa-libglapi >= 11.0.3, libselinux >= 2.4, libXext >= 1.3.3, libXdamage >= 1.1.4, libXfixes >= 5.0.1, libX11 >= 1.6.3, libXxf86vm >= 1.1.4, libdrm >= 2.4.65, libXau >= 1.0.8, pcre >= 8.37")
+        SET(CPACK_RPM_PACKAGE_RELOCATABLE "false")
+        configure_file(${CMAKE_CURRENT_SOURCE_DIR}/dist_package/CHANGELOG_RPM.in
+                        ${CMAKE_CURRENT_BINARY_DIR}/changelog)
+        SET(CPACK_RPM_CHANGELOG_FILE "${CMAKE_CURRENT_BINARY_DIR}/changelog")
+        # Avoid this error "executable-marked-as-config-file /usr/bin/cutevcf"
+        # Config flag is automatically set in cutevcf.spec %files section...
+        # %config "/usr/bin/cutevcf"
+        # used to explicitly specify %(<directive>) file line in the spec file.
+        SET(CPACK_RPM_USER_FILELIST "/usr/bin/cutevcf")
 
     ENDIF(WIN32 AND NOT UNIX)
 
@@ -227,6 +256,9 @@ Categories=Application;Education;Science;")
     # Not all CPack generators use it (at least NSIS, WIX and OSXX11 do).
     SET(CPACK_PACKAGE_EXECUTABLES ${EXECUTABLE_NAME};${PROJECT_NAME})
 
-    INCLUDE(CPack)
-
 ENDIF(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
+
+
+
+
+
