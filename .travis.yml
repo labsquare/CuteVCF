@@ -1,0 +1,17 @@
+language: cpp
+dist: trusty
+compiler: g++
+sudo: required
+
+before_install:
+  - sudo add-apt-repository ppa:beineri/opt-qt57-trusty -y
+  - sudo apt-get update
+
+install:
+  - sudo apt-get install qt57base qt57charts-no-lgpl
+  - source /opt/qt57/bin/qt57-env.sh
+
+
+script:
+  - /opt/qt57/bin/qmake 
+  - make 
