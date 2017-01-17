@@ -1,4 +1,4 @@
-# CuteVCF
+# CuteVCF ![Travis](https://api.travis-ci.org/labsquare/CuteVCF.svg?branch=master)
 simple GUI viewer for [vcf file](https://samtools.github.io/hts-specs/VCFv4.2.pdf) (variant call format) using htslib. 
 
 ![preview](https://raw.githubusercontent.com/labsquare/CuteVCF/master/preview.gif)
