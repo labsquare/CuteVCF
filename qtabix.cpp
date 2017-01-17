@@ -167,6 +167,7 @@ bool QTabix::readInfo()
     tbx_itr_destroy(iter);
     tbx_destroy(tbx);
 
+    return true;
 }
 
 

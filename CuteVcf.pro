@@ -12,6 +12,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET =  CuteVCF
 TEMPLATE = app
 
+CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT
 
 # On linux, compile htslib
 unix {
@@ -32,35 +33,57 @@ LIBS += -L$$PWD/win32 -lhts
 
 INCLUDEPATH += $$PWD/htslib
 DEPENDPATH += $$PWD/htslib
+
+RC_ICONS = app.ico
 }
 
 
+include("QFontIcon/QFontIcon.pri")
 
 
+ICON = myapp.icns
 
-SOURCES += main.cpp\
-        mainwindow.cpp \
-    qtabix.cpp \
-    vcfmodel.cpp \
-    vcfline.cpp \
-    infowidget.cpp \
-    samplewidget.cpp \
-    vcfheader.cpp \
-    aboutdialog.cpp \
-    createindexdialog.cpp
 
-HEADERS  += mainwindow.h \
-    qtabix.h \
-    vcfmodel.h \
-    vcfline.h \
+RESOURCES += files.qrc
+
+HEADERS += \
+    aboutdialog.h \
+    createindexdialog.h \
     infowidget.h \
+    mainwindow.h \
+    qtabix.h \
     samplewidget.h \
     vcfheader.h \
-    aboutdialog.h \
-    createindexdialog.h
+    vcfline.h \
+    vcfmodel.h
 
-RESOURCES += \
-    icons/icons.qrc \
-    files.qrc
+SOURCES += \
+    aboutdialog.cpp \
+    createindexdialog.cpp \
+    infowidget.cpp \
+    mainwindow.cpp \
+    main.cpp \
+    qtabix.cpp \
+    samplewidget.cpp \
+    vcfheader.cpp \
+    vcfline.cpp \
+    vcfmodel.cpp
 
+# Define install path
+isEmpty(INSTALL_PREFIX){
+    INSTALL_PREFIX=$$PWD
+}
+
+binary.path = $$INSTALL_PREFIX/bin/
+binary.files = $$PWD/CuteVCF
+
+INSTALLS += binary
+
+unix{
+
+library.path += $$INSTALL_PREFIX/lib/
+library.files += $$PWD/htslib/libhts.so*
+
+INSTALLS += library
+}
 

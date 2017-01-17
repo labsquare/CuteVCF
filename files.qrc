@@ -4,5 +4,12 @@
         <file>AUTHORS</file>
         <file>README</file>
         <file>CHANGELOG</file>
+        <file>fonts/fontawesome.ttf</file>
+        <file>icons/app.png</file>
+        <file>icons/ensembl.png</file>
+        <file>icons/search.png</file>
+        <file>icons/squares.gif</file>
+        <file>icons/ucsc.png</file>
+        <file>icons/dna.png</file>
     </qresource>
 </RCC>

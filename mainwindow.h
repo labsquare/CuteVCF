@@ -27,6 +27,8 @@ along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 #include "samplewidget.h"
 #include "aboutdialog.h"
 #include "createindexdialog.h"
+#include "qfonticon.h"
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -71,6 +73,7 @@ private:
     QDockWidget * mInfoDock;
     QDockWidget * mSampleDock;
     QLabel * mVariantCount;
+    QLabel * mLoadingLabel;
     QMovie * mLoadingAnimation;
     QComboBox * mChromBox;
 

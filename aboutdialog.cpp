@@ -33,7 +33,7 @@ AboutDialog::AboutDialog(QWidget *parent) : QDialog(parent)
     mCancelButton = new QPushButton(tr("Cancel"));
     mGithubButton = new QPushButton(tr("Github"));
 
-    mIconLabel->setPixmap(QPixmap(":/app.png").scaledToHeight(64, Qt::SmoothTransformation));
+    mIconLabel->setPixmap(QPixmap(":icons/app.png").scaledToHeight(64, Qt::SmoothTransformation));
     mIconLabel->setFixedWidth(64);
     mTitleLabel->setText(qApp->applicationName()+" "+qApp->applicationVersion());
     mTitleLabel->setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
