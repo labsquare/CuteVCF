@@ -1,6 +1,5 @@
 # CuteVCF
 simple GUI viewer for [vcf file](https://samtools.github.io/hts-specs/VCFv4.2.pdf) (variant call format) using htslib. 
-Only tested on Linux for now. But binary will come soon after compiling htslib on windows.
 
 ![preview](https://raw.githubusercontent.com/labsquare/CuteVCF/master/preview.gif)
 
@@ -12,6 +11,6 @@ Only tested on Linux for now. But binary will come soon after compiling htslib o
 * Compile it and Run it 
 
 ## From Shell  
-
+    git clone --recursive git@github.com:labsquare/CuteVCF.git
     qmake CuteVcf.pro 
     make 
