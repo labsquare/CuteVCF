@@ -14,4 +14,4 @@ install:
 
 script:
   - /opt/qt57/bin/qmake 
-  - make 
+  - make  
