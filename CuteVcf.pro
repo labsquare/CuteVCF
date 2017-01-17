@@ -5,6 +5,7 @@
 #-------------------------------------------------
 
 QT       += core gui concurrent
+QMAKE_CXXFLAGS += -std=c++11
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 

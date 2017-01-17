@@ -100,19 +100,23 @@ void VcfModel::load()
     QByteArray line;
     mRealCount = 0;
 
-    if (mTabixFile.open())
+    for (QString region : mRegions)
     {
-        while (mTabixFile.readLineInto(line))
+        mTabixFile.setRegion(region);
+
+        if (mTabixFile.open())
         {
-            if (mRealCount < MAX_ITEMS)
+            while (mTabixFile.readLineInto(line))
             {
-                VcfLine item = VcfLine::fromLine(line) ;
-                mTampons.append(item);
+                if (mRealCount < MAX_ITEMS)
+                {
+                    VcfLine item = VcfLine::fromLine(line) ;
+                    mTampons.append(item);
+                }
+                mRealCount++;
             }
-            mRealCount++;
         }
     }
-
 
     setLoading(false);
 
@@ -128,9 +132,9 @@ void VcfModel::setLoading(bool enable)
 void VcfModel::setRegion(const QString &region)
 {
     // launch async data load
+    mRegions = region.split(",");
     mFuture.cancel();
     mFuture.waitForFinished();
-    mTabixFile.setRegion(region);
     mFuture = QtConcurrent::run(this, &VcfModel::load);
     mFutureWatcher.setFuture(mFuture);
 }

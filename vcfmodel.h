@@ -78,7 +78,7 @@ private:
     QString mFilename;
     QTabix mTabixFile;
     QHash<char, QColor> mBaseColors;
-    QString mRegion;
+    QStringList mRegions;
     QFuture<void> mFuture;
     QFutureWatcher<void> mFutureWatcher;
     bool mLoading;
