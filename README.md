@@ -34,7 +34,7 @@ Be sure you have the correct version of Qt (>5.7) by using qmake. You will find 
      qmake --version
      qmake 
      make 
-     sudo make install 
+ 
      
      
 
